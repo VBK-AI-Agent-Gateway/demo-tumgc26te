@@ -15,16 +15,13 @@ radial-gradient(circle at 20% 0%,rgba(139,92,246,.25),transparent 40%),
 radial-gradient(circle at 80% 10%,rgba(255,61,139,.18),transparent 40%),
 var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 button{cursor:pointer;font-family:inherit}
-/* 顶部栏 */
 .top{background:linear-gradient(90deg,#2b1a5e,#4a1d5e,#6b1f4f);padding:14px 18px;
 display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;
 box-shadow:0 2px 14px rgba(255,61,139,.25);border-bottom:1px solid rgba(255,255,255,.06)}
 .top .logo{font-size:19px;font-weight:bold;background:linear-gradient(90deg,var(--pink),var(--gold));
 -webkit-background-clip:text;background-clip:text;color:transparent}
 .top .stat{font-size:12px;color:var(--muted)}
-/* 布局 */
 .layout{display:flex;min-height:calc(100vh - 56px)}
-/* 左侧菜单 */
 .sider{width:172px;background:rgba(23,20,50,.85);border-right:1px solid var(--line);
 padding:14px 10px;flex-shrink:0}
 .sider .s{padding:11px 12px;border-radius:9px;margin-bottom:6px;cursor:pointer;
@@ -32,30 +29,24 @@ font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
 .sider .s:hover{background:var(--panel2);color:var(--text)}
 .sider .s.on{background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;
 box-shadow:0 3px 10px rgba(255,61,139,.35)}
-/* 主区 */
-.main{flex:1;padding:16px;min-width:0;max-width:900px}
-/* 右侧已点列表 */
+.main{flex:1;padding:16px;max-width:900px;min-width:0}
 .sidebar{width:260px;background:rgba(23,20,50,.85);border-left:1px solid var(--line);
 padding:14px;display:flex;flex-direction:column;gap:10px;flex-shrink:0}
 h2.sec{font-size:15px;margin-bottom:12px;color:var(--cyan);display:flex;
 justify-content:space-between;align-items:center}
 h2.sec .sub{font-size:11px;color:var(--muted);font-weight:normal}
-/* 卡片 */
 .card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);
 border-radius:12px;padding:14px;margin-bottom:12px}
-/* 搜索框 */
 .search{display:flex;gap:8px;margin-bottom:14px}
 .search input{flex:1;padding:10px 14px;border-radius:22px;border:1px solid var(--line);
 background:var(--panel);color:var(--text);font-size:14px;outline:none}
 .search input:focus{border-color:var(--pink)}
 .search button{border:none;border-radius:22px;padding:0 22px;font-size:14px;
 background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff}
-/* 分类Tab */
 .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .cat{padding:6px 15px;border-radius:16px;background:var(--panel);border:1px solid var(--line);
 font-size:12px;cursor:pointer;color:var(--muted)}
 .cat.on{background:linear-gradient(90deg,var(--cyan),var(--purple));color:#fff;border-color:transparent}
-/* 歌曲行 */
 .song{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;
 background:rgba(31,27,69,.5);border:1px solid transparent;margin-bottom:8px}
 .song:hover{border-color:var(--pink);background:rgba(255,61,139,.08)}
@@ -65,12 +56,9 @@ background:rgba(31,27,69,.5);border:1px solid transparent;margin-bottom:8px}
 .song .mt{font-size:12px;color:var(--muted);margin-top:2px}
 .tag{display:inline-block;font-size:10px;padding:1px 7px;border-radius:8px;margin-right:6px}
 .tag.hot{background:rgba(255,61,139,.2);color:var(--pink)}
-.tag.new{background:rgba(52,211,153,.18);color:var(--green)}
-.tag.k{background:rgba(34,211,238,.15);color:var(--cyan)}
-.song .btn{border:none;border-radius:16px;padding:5px 14px;font-size:12px;
+.btn{border:none;border-radius:16px;padding:5px 14px;font-size:12px;
 background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;flex-shrink:0}
-.song .btn.pl{background:linear-gradient(90deg,var(--cyan),#0ea5e9)}
-/* 已点列表 */
+.btn.pl{background:linear-gradient(90deg,var(--cyan),#0ea5e9)}
 .qlist{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}
 .qitem{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;
 font-size:12px;position:relative;cursor:pointer}
@@ -82,7 +70,6 @@ font-size:12px;position:relative;cursor:pointer}
 .qitem.playing{border-color:var(--gold);background:rgba(251,191,36,.1);animation:glow 1.4s infinite}
 @keyframes glow{50%{box-shadow:0 0 12px rgba(251,191,36,.5)}}
 .qempty{text-align:center;color:var(--muted);padding:40px 10px;font-size:13px}
-/* 播放器底栏 */
 .player{background:linear-gradient(90deg,#1b1640,#2a1450);border-top:1px solid var(--pink);
 padding:12px 18px;display:flex;align-items:center;gap:16px;position:sticky;bottom:0;z-index:60;
 box-shadow:0 -4px 16px rgba(0,0,0,.4)}
@@ -97,29 +84,24 @@ background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}
 .bar .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--pink));
 border-radius:4px;transition:width .3s}
 .time{font-size:11px;color:var(--muted);width:74px;text-align:right}
-/* 评分 */
 .score{display:flex;gap:10px;flex-wrap:wrap}
 .sc{width:66px;text-align:center;background:var(--panel2);border:1px solid var(--line);
 border-radius:10px;padding:10px 4px;cursor:pointer}
 .sc:hover{border-color:var(--gold);transform:translateY(-2px)}
 .sc .v{font-size:17px;font-weight:bold;color:var(--gold)}
 .sc .l{font-size:10px;color:var(--muted);margin-top:3px}
-/* 榜单行 */
 .rank{display:flex;justify-content:space-between;align-items:center;padding:9px 4px;
 border-bottom:1px dashed var(--line);font-size:13px}
 .rank .r1{color:var(--gold);font-weight:bold;width:30px}
-/* 弹窗 */
 .mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;align-items:center;justify-content:center}
 .mask.open{display:flex}
 .modal{background:var(--panel);border:1px solid var(--purple);border-radius:14px;width:92%;
 max-width:420px;max-height:84vh;overflow:auto;padding:18px}
 .modal h3{font-size:16px;color:var(--cyan);margin-bottom:12px}
-.modal .btn{width:100%;margin-top:10px;padding:10px;border:none;border-radius:8px;
-background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;font-size:14px}
-.modal .btn.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
+.modal .btn{width:100%;margin-top:10px;padding:10px;border-radius:8px;font-size:14px}
 .modal .row{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;
 border-bottom:1px dashed var(--line)}
-/* 底部Tab(手机) */
+.hamb,.bag{display:none}
 .tabbar{display:none}
 @media(max-width:860px){
  .sider{position:fixed;left:0;top:56px;bottom:64px;z-index:40;transform:translateX(-100%);transition:.2s}
@@ -128,22 +110,19 @@ border-bottom:1px dashed var(--line)}
   transform:translateX(100%);transition:.2s}
  .sidebar.open{transform:none}
  .main{max-width:none;padding:12px}
- .hamb,.bag{display:block!important}
+ .hamb,.bag{display:block;background:none;border:1px solid var(--line);border-radius:8px;
+  color:var(--text);padding:5px 10px;font-size:15px}
  .tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--panel);
   border-top:1px solid var(--line);z-index:70}
  .tabbar div{flex:1;text-align:center;padding:9px 0;font-size:11px;color:var(--muted);cursor:pointer}
  .tabbar div.on{color:var(--pink)}
  .tabbar div span{display:block;font-size:19px}
  .player{bottom:56px}
- .hamb,.bag{background:none;border:1px solid var(--line);border-radius:8px;color:var(--text);
-  padding:5px 10px;font-size:15px}
 }
-.hamb,.bag{display:none}
 </style>
 </head>
 <body>
 
-<!-- 顶部 -->
 <div class="top">
   <div style="display:flex;gap:10px;align-items:center">
     <button class="hamb" onclick="document.querySelector('.sider').classList.toggle('open')">☰</button>
@@ -154,7 +133,6 @@ border-bottom:1px dashed var(--line)}
 </div>
 
 <div class="layout">
-  <!-- 左侧菜单 -->
   <div class="sider">
     <div class="s on" onclick="setView('sing',this)">🎤 点歌台</div>
     <div class="s" onclick="setView('hot',this)">🔥 热门榜单</div>
@@ -163,11 +141,7 @@ border-bottom:1px dashed var(--line)}
     <div class="s" onclick="setView('hist',this)">🕘 历史记录</div>
     <div class="s" onclick="openHelp()">❓ 使用帮助</div>
   </div>
-
-  <!-- 主区 -->
   <div class="main" id="mainBox"></div>
-
-  <!-- 右侧已点列表 -->
   <div class="sidebar">
     <h2 class="sec">已点歌曲 <span class="sub" id="qCnt">0首</span></h2>
     <div style="display:flex;gap:8px">
@@ -178,52 +152,38 @@ border-bottom:1px dashed var(--line)}
   </div>
 </div>
 
-<!-- 播放器底栏 -->
 <div class="player">
-  <button class="pbtn sm" onclick="prevSong()" title="上一首">⏮</button>
+  <button class="pbtn sm" onclick="prevSong()">⏮</button>
   <button class="pbtn" id="playBtn" onclick="togglePlay()">▶</button>
-  <button class="pbtn sm" onclick="nextSong()" title="下一首">⏭</button>
+  <button class="pbtn sm" onclick="nextSong()">⏭</button>
   <div class="pn"><div class="t" id="pnTitle">未播放</div><div class="s" id="pnSub">从歌单点一首开始吧</div></div>
   <div class="bar" onclick="seek(event)"><div class="fill" id="barFill"></div></div>
   <div class="time" id="pnTime">00:00 / 00:00</div>
   <button class="pbtn sm" onclick="toggleMute()" id="muteBtn">🔊</button>
 </div>
 
-<!-- 底部Tab(手机) -->
 <div class="tabbar">
   <div class="on" onclick="setView('sing');showTab(this)"><span>🎤</span>点歌</div>
   <div onclick="setView('hot');showTab(this)"><span>🔥</span>榜单</div>
-  <div onclick="switchQueue(true)"><span>🎵</span>已点</div>
+  <div onclick="switchQ()"><span>🎵</span>已点</div>
   <div onclick="setView('score');showTab(this)"><span>⭐</span>评分</div>
 </div>
 
-<!-- 弹窗 -->
 <div class="mask" id="mask"><div class="modal" id="modalBox"></div></div>
 
 <script>
 /* =========================================================================
  * KTV 点歌系统 · 单页应用
  * 分层: DB(localStorage持久化) → 业务逻辑 → 视图渲染
- * 功能: 搜索/分类点歌、已点队列(插队/置顶/删除)、模拟播放器(上一首/下一首/
- *       进度拖动/静音)、热门榜单、打分评价、历史记录、包厢信息
  * ========================================================================= */
-
-/* ---------- 1. 数据层 ---------- */
 const KEY='ktv_sys_v1';
 const DB=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}})();
 function save(){localStorage.setItem(KEY,JSON.stringify(DB))}
-if(!DB.seeded){
-  DB.queue=[];      /* 已点队列 [{id,order}] */
-  DB.history=[];    /* 播放历史 */
-  DB.scores={};     /* 打分 {songId:[{v,at}]} */
-  DB.cur=null;      /* 当前播放歌曲id */
-  DB.pos=0;         /* 播放进度(秒) */
-  DB.playing=false;
-  DB.muted=false;
-  DB.room={name:'VIP豪华包A08',people:6,host:'王老板'}; /* 包厢信息 */
+if(!DB.seeded){DB.queue=[];DB.history=[];DB.scores={};DB.cur=null;DB.pos=0;
+  DB.playing=false;DB.muted=false;DB.room={name:'VIP豪华包A08',people:6,host:'王老板'};
   DB.seeded=true;save()}
 
-/* 歌库：32首(华语/粤语/英文/民谣/摇滚/儿歌 六类) */
+/* 歌库：32首(六类) */
 const SONGS=[
  {id:1,n:'晴天',a:'周杰伦',c:'华语',len:269,hot:1,ny:2003},
  {id:2,n:'七里香',a:'周杰伦',c:'华语',len:299,hot:1,ny:2004},
@@ -260,45 +220,36 @@ const SONGS=[
 const CATS=['全部','华语','粤语','英文','民谣','摇滚','儿歌'];
 const S=id=>SONGS.find(s=>s.id===id);
 
-/* ---------- 2. 业务逻辑 ---------- */
 let view='sing',curCat='全部',kw='',searchIn='',timer=null;
 function fmt(t){t=Math.max(0,Math.floor(t));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
 
-/* 点歌: 加入队列 */
+/* 点歌/插队/队列管理 */
 function addSong(id){
   if(DB.queue.some(q=>q.id===id)){toast('这首歌已在列表中');return}
-  DB.queue.push({id,order:Date.now()});
-  save();renderQueue();
-  if(!DB.cur)playSong(id);   /* 第一首自动播放 */
-  toast('已加入点歌列表 ✓');
-  updateStat()}
-/* 插队: 移到最前 */
+  DB.queue.push({id,order:Date.now()});save();renderQueue();
+  if(!DB.cur)playSong(id);
+  toast('已加入点歌列表 ✓');updateStat()}
 function jumpSong(id){
   const i=DB.queue.findIndex(q=>q.id===id);
-  if(i>0){const [q]=DB.queue.splice(i,1);DB.queue.unshift(q);save();renderQueue();toast('已插队到首位 ⚡')}
+  if(i>0){const q=DB.queue.splice(i,1)[0];DB.queue.unshift(q);save();renderQueue();toast('已插队到首位 ⚡')}
   if(DB.cur!==id)playSong(id)}
-/* 置底/删除/清空/随机 */
-function toBottom(id){const i=DB.queue.findIndex(q=>q.id===id);
-  if(i>=0&&i<DB.queue.length-1){const [q]=DB.queue.splice(i,1);DB.queue.push(q);save();renderQueue()}}
-function removeSong(id){DB.queue=DB.queue.queue?DB.queue:DB.queue;
-  DB.queue=DB.queue.filter?DB.queue.filter(q=>q.id!==id):DB.queue;
-  DB.queue=(DB.queue||[]).filter(q=>q.id!==id);
+function removeSong(id){
+  DB.queue=DB.queue.filter(q=>q.id!==id);
   if(DB.cur===id){stopTick();DB.cur=null;DB.playing=false;DB.pos=0;save();renderPlayer()}
   save();renderQueue();updateStat()}
-function clearQueue(){if(!confirm('清空已点列表?'))return;DB.queue=[];
-  stopTick();DB.cur=null;DB.playing=false;DB.pos=0;save();renderQueue();renderPlayer();updateStat()}
+function clearQueue(){if(!confirm('清空已点列表?'))return;
+  DB.queue=[];stopTick();DB.cur=null;DB.playing=false;DB.pos=0;
+  save();renderQueue();renderPlayer();updateStat()}
 function shuffleQueue(){
   for(let i=DB.queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));
-    [DB.queue[i],DB.queue[j]]=[DB.queue[j],DB.queue[i]]}
+    const t=DB.queue[i];DB.queue[i]=DB.queue[j];DB.queue[j]=t}
   save();renderQueue();toast('已随机排序 🔀')}
 
 /* 播放控制 */
 function playSong(id){const s=S(id);if(!s)return;
-  DB.cur=id;DB.pos=0;DB.playing=true;save();
-  DB.history.unshift({id,at:new Date().toLocaleString()});
-  DB.history=DB.history.slice(0,50);save();
-  renderPlayer();startTick();
-  /* 从队列移除(已播) */
+  DB.cur=id;DB.pos=0;DB.playing=true;
+  DB.history.unshift({id,at:new Date().toLocaleString()});DB.history=DB.history.slice(0,50);
+  save();renderPlayer();startTick();
   DB.queue=DB.queue.filter(q=>q.id!==id);save();renderQueue();updateStat()}
 function togglePlay(){if(!DB.cur){toast('请先点歌');return}
   DB.playing=!DB.playing;save();renderPlayer();
@@ -306,7 +257,7 @@ function togglePlay(){if(!DB.cur){toast('请先点歌');return}
 function stopTick(){if(timer){clearInterval(timer);timer=null}}
 function startTick(){stopTick();timer=setInterval(()=>{
   const s=S(DB.cur);if(!s){stopTick();return}
-  DB.pos++;if(DB.pos>=s.len){nextSong();return}   /* 自动切下一首 */
+  DB.pos++;if(DB.pos>=s.len){nextSong();return}
   renderBar()},1000)}
 function nextSong(){const q=DB.queue[0];
   if(q)playSong(q.id);
@@ -318,25 +269,24 @@ function seek(e){const s=S(DB.cur);if(!s)return;
   DB.pos=Math.round((e.clientX-r.left)/r.width*s.len);save();renderBar()}
 function toggleMute(){DB.muted=!DB.muted;save();
   document.getElementById('muteBtn').textContent=DB.muted?'🔇':'🔊'}
-
-/* 打分 */
 function scoreSong(id,v){
   (DB.scores[id]=DB.scores[id]||[]).push({v,at:new Date().toLocaleString()});
   save();renderView();toast('评分成功 ⭐ '+v+'分')}
 
-/* ---------- 3. 视图渲染 ---------- */
+/* 视图切换 */
 function setView(v,el){view=v;kw='';searchIn='';
   document.querySelectorAll('.sider .s').forEach(s=>s.classList.remove('on'));
-  if(el)el.classList.add('on');else{const map={sing:0,hot:1,rank:2,score:3,hist:4};
+  if(el)el.classList.add('on');
+  else{const map={sing:0,hot:1,rank:2,score:3,hist:4};
     const s=document.querySelectorAll('.sider .s')[map[v]];if(s)s.classList.add('on')}
-  document.querySelector('.sider').classList.remove('open');
-  renderView()}
+  document.querySelector('.sider').classList.remove('open');renderView()}
 function showTab(el){document.querySelectorAll('.tabbar div').forEach(d=>d.classList.remove('on'));el.classList.add('on')}
+function switchQ(){document.querySelector('.sidebar').classList.toggle('open')}
 function renderView(){({sing:viewSing,hot:viewHot,rank:viewRank,score:viewScore,hist:viewHist}[view]||viewSing)()}
 
-/* 点歌台(搜索+分类+列表) */
+/* 点歌台 */
 function viewSing(){
-  let list=SONGS.filter(s=>s.c===curCat||curCat==='全部');
+  let list=SONGS.filter(s=>curCat==='全部'||s.c===curCat);
   if(kw)list=list.filter(s=>(s.n+s.a).toLowerCase().includes(kw.toLowerCase()));
   document.getElementById('mainBox').innerHTML=`
     <div class="search"><input id="searchIn" placeholder="🔍 歌名 / 歌手，回车搜索" value="${searchIn}"
@@ -345,8 +295,7 @@ function viewSing(){
     <h2 class="sec">点歌列表 <span class="sub">共${list.length}首 · 已点${DB.queue.length}首</span></h2>
     <div class="card">${list.length?list.map((s,i)=>songRow(s,i)).join(''):
       '<div class="qempty">没有找到相关歌曲 🎵</div>'}</div>`}
-function doSearch(){kw=document.getElementById('searchIn').value.trim();
-  searchIn=kw;viewSing()}
+function doSearch(){kw=document.getElementById('searchIn').value.trim();searchIn=kw;viewSing()}
 function setCat(c){curCat=c;viewSing()}
 function songRow(s,i){
   const inQ=DB.queue.some(q=>q.id===s.id);
@@ -358,30 +307,28 @@ function songRow(s,i){
 
 /* 热门榜单 */
 function viewHot(){
-  const hot=[...SONGS].sort((a,b)=>b.hot-a.hot||a.id-b.id).slice(0,10);
+  const hot=SONGS.slice().sort((a,b)=>b.hot-a.hot||a.id-b.id).slice(0,10);
   const cnt={};DB.history.forEach(h=>cnt[h.id]=(cnt[h.id]||0)+1);
-  const sung=Object.entries(cnt).map(([id,c])=>({s:S(+id),c})).filter(x=>x.s)
+  const sung=Object.keys(cnt).map(id=>({s:S(+id),c:cnt[id]})).filter(x=>x.s)
     .sort((a,b)=>b.c-a.c).slice(0,10);
   document.getElementById('mainBox').innerHTML=`
     <div class="card"><h2 class="sec">🔥 KTV热歌榜 TOP10</h2>
-      ${hot.map((s,i)=>`<div class="rank"><span><span class="r1">${i+1}</span>
-        ${i<3?'🏅':'　'} ${s.n} — ${s.a}</span>
-        <span><button class="btn" style="padding:4px 12px" onclick="addSong(${s.id})">点歌</button></span></div>`).join('')}</div>
+      ${hot.map((s,i)=>`<div class="rank"><span><span class="r1">${i+1}</span> ${i<3?'🏅':'　'} ${s.n} — ${s.a}</span>
+        <button class="btn" onclick="addSong(${s.id})">点歌</button></div>`).join('')}</div>
     <div class="card"><h2 class="sec">📈 本包厢已唱排行</h2>
-      ${sung.length?sung.map((x,i)=>`<div class="rank"><span><span class="r1">${i+1}</span>
-        ${x.s.n} — ${x.s.a}</span><span style="color:var(--cyan)">${x.c}次</span></div>`).join(''):
+      ${sung.length?sung.map((x,i)=>`<div class="rank"><span><span class="r1">${i+1}</span> ${x.s.n} — ${x.s.a}</span>
+        <span style="color:var(--cyan)">${x.c}次</span></div>`).join(''):
         '<div class="qempty">还没唱过歌，快去点歌吧 🎤</div>'}</div>`}
 
 /* 已唱排行 */
 function viewRank(){
   const cnt={};DB.history.forEach(h=>cnt[h.id]=(cnt[h.id]||0)+1);
-  let arr=Object.entries(cnt).map(([id,c])=>({s:S(+id),c})).filter(x=>x.s)
+  const arr=Object.keys(cnt).map(id=>({s:S(+id),c:cnt[id]})).filter(x=>x.s)
     .sort((a,b)=>b.c-a.c).slice(0,15);
   document.getElementById('mainBox').innerHTML=`<div class="card">
     <h2 class="sec">🏆 已唱排行(按点播次数)</h2>
-    ${arr.length?arr.map((x,i)=>`<div class="rank"><span><span class="r1">${i+1}</span>
-      ${x.s.n} — ${x.s.a}</span><span>${x.c}次</span></div>`).join(''):
-      '<div class="qempty">暂无记录</div>'}</div>`}
+    ${arr.length?arr.map((x,i)=>`<div class="rank"><span><span class="r1">${i+1}</span> ${x.s.n} — ${x.s.a}</span>
+      <span>${x.c}次</span></div>`).join(''):'<div class="qempty">暂无记录</div>'}</div>`}
 
 /* 打分评价 */
 function viewScore(){
@@ -400,7 +347,7 @@ function viewScore(){
 /* 历史记录 */
 function viewHist(){
   document.getElementById('mainBox').innerHTML=`<div class="card">
-    <h2 class="sec">🕘 播放历史 <button class="btn" style="padding:4px 12px" onclick="clearHist()">清空</button></h2>
+    <h2 class="sec">🕘 播放历史 <button class="btn" onclick="clearHist()">清空</button></h2>
     ${DB.history.length?DB.history.map(h=>{const s=S(h.id);
       return `<div class="song"><div class="info"><div class="nm">${s.n}</div>
         <div class="mt">${s.a} · ${h.at}</div></div>
@@ -408,11 +355,11 @@ function viewHist(){
       '<div class="qempty">暂无播放历史</div>'}</div>`}
 function clearHist(){if(!confirm('清空历史?'))return;DB.history=[];save();viewHist()}
 
-/* 已点列表侧栏 */
+/* 已点列表 */
 function renderQueue(){
   document.getElementById('queueBox').innerHTML=DB.queue.length?
-    DB.queue.map((q,i)=>{const s=S(q.id);const isCur=DB.cur===q.id;
-      return `<div class="qitem ${isCur?'playing':''}" onclick="jumpSong(${q.id})" title="点击切到这首">
+    DB.queue.map((q,i)=>{const s=S(q.id);
+      return `<div class="qitem ${DB.cur===q.id?'playing':''}" onclick="jumpSong(${q.id})">
         <span class="x" onclick="event.stopPropagation();removeSong(${q.id})">×</span>
         <div class="qn">${i+1}. ${s.n}</div>
         <div class="qm">${s.a} · ${fmt(s.len)}</div></div>`}).join(''):
@@ -425,7 +372,7 @@ function renderPlayer(){
   const s=S(DB.cur);
   document.getElementById('playBtn').textContent=DB.playing?'⏸':'▶';
   document.getElementById('pnTitle').textContent=s?s.n+' — '+s.a:'未播放';
-  document.getElementById('pnSub').textContent=s?`${s.c} · 第${(DB.history.findIndex(h=>h.id===DB.cur)+1)||1}次播放`:'从歌单点一首开始吧';
+  document.getElementById('pnSub').textContent=s?`${s.c} · 已播${(DB.history.filter(h=>h.id===DB.cur).length)||1}次`:'从歌单点一首开始吧';
   renderBar();updateStat()}
 function renderBar(){
   const s=S(DB.cur);const len=s?s.len:0;
@@ -456,7 +403,6 @@ function toast(msg){const t=document.createElement('div');
   'font-size:13px;z-index:200;box-shadow:0 4px 14px rgba(0,0,0,.4)';
   document.body.appendChild(t);setTimeout(()=>t.remove(),1600)}
 
-/* ---------- 4. 启动 ---------- */
 renderView();renderQueue();renderPlayer();
 </script>
 </body>
