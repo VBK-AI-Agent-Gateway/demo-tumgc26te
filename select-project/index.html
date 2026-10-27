@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>医院智慧挂号就诊检查系统</title>
+<style>
+/* ============ 主题变量：公立医院蓝色医疗风 ============ */
+:root{--primary:#1a6fb5;--primary-d:#0f4f8a;--primary-l:#e8f2fa;
+--bg:#f4f7fa;--card:#fff;--text:#2c3e50;--muted:#7f8c8d;--line:#e3eaf1;
+--green:#27ae60;--red:#e74c3c;--orange:#f39c12}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);
+color:var(--text);font-size:14px;padding-bottom:64px}
+button{cursor:pointer;font-family:inherit}
+/* 顶部栏 */
+.topbar{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;
+position:sticky;top:0;z-index:50;padding:12px 16px;display:flex;align-items:center;
+justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.topbar .logo{font-size:17px;font-weight:bold}
+.topbar .user{font-size:12px;opacity:.9;cursor:pointer}
+/* 首页宫格 */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px}
+.gitem{background:var(--card);border-radius:12px;padding:14px 6px;text-align:center;
+box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid var(--line);cursor:pointer;transition:.15s}
+.gitem:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(26,111,181,.2)}
+.gitem .ico{font-size:26px;display:block;margin-bottom:6px}
+.gitem .nm{font-size:12px}
+/* 面板与卡片 */
+.panel{display:none;padding:14px}
+.panel.active{display:block}
+.card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:14px;
+box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid var(--line)}
+.card h3{font-size:15px;color:var(--primary-d);margin-bottom:10px;
+border-left:4px solid var(--primary);padding-left:8px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;
+border-bottom:1px dashed var(--line);font-size:13px}
+.row:last-child{border:none}
+.row .sub{color:var(--muted);font-size:12px}
+.btn{background:var(--primary);color:#fff;border:none;border-radius:6px;
+padding:7px 16px;font-size:13px}
+.btn.sm{padding:4px 10px;font-size:12px}
+.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn.warn{background:var(--orange)}.btn.danger{background:var(--red)}.btn.ok{background:var(--green)}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:6px 14px;background:#fff;border:1px solid var(--line);border-radius:16px;
+font-size:13px;cursor:pointer}
+.tab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:10px}
+.tag.g{background:#e6f7ec;color:var(--green)}.tag.o{background:#fdf3e2;color:var(--orange)}
+.tag.r{background:#fdeaea;color:var(--red)}.tag.b{background:var(--primary-l);color:var(--primary)}
+input,select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;
+font-size:14px;margin-bottom:10px;background:#fff;font-family:inherit}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
+/* 桌面端适配 */
+@media(min-width:800px){.grid{grid-template-columns:repeat(6,1fr)}.panel{max-width:960px;margin:0 auto}}
+.notice{background:#fff8e6;border:1px solid #f5d98a;border-radius:8px;padding:10px;
+font-size:13px;color:#8a6d1a;margin-bottom:12px}
+.empty{text-align:center;color:var(--muted);padding:26px;font-size:13px}
+.money{color:var(--red);font-weight:bold}
+/* 底部导航(手机优先) */
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+display:flex;z-index:50;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+.tabbar div{flex:1;text-align:center;padding:8px 0;font-size:11px;color:var(--muted);
+cursor:pointer;position:relative}
+.tabbar div.on{color:var(--primary)}
+.tabbar div span{display:block;font-size:20px;margin-bottom:2px}
+.badge{position:absolute;top:2px;right:22%;background:var(--red);color:#fff;
+font-size:10px;border-radius:8px;padding:0 5px}
+/* 弹窗 */
+.mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;
+align-items:center;justify-content:center}
+.mask.open{display:flex}
+.modal{background:#fff;border-radius:14px;width:92%;max-width:440px;max-height:86vh;
+overflow:auto;padding:18px}
+.modal h3{color:var(--primary-d);margin-bottom:12px;font-size:16px}
+.modal .btn{width:100%;margin-top:6px;padding:10px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:5px 12px;
+margin:3px;font-size:12px;cursor:pointer}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip.off{opacity:.4;text-decoration:line-through;cursor:not-allowed}
+/* 问诊对话 */
+.chatbox{height:250px;overflow:auto;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px}
+.bubble{display:flex;margin-bottom:8px}
+.bubble.me{justify-content:flex-end}
+.bubble .b{max-width:78%;padding:8px 12px;border-radius:10px;font-size:13px;
+line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.bubble.sys .b{background:#fff}
+.bubble.me .b{background:var(--primary);color:#fff}
+.bubble .who{font-size:10px;color:var(--muted);margin-top:2px}
+.bubble.me .who{color:rgba(255,255,255,.75)}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部栏 ===== -->
+<div class="topbar">
+  <div class="logo">🏥 市第一人民医院 · 智慧就医</div>
+  <div class="user" id="topUser" onclick="switchView('mine')">未登录</div>
+</div>
+
+<!-- ===== 首页 ===== -->
+<div class="panel active" id="p-home">
+  <div class="notice">📌 温馨提示：预约挂号每日 08:00 放号，可提前 7 天预约；当日号源 06:30 开放。就诊请携带身份证及医保卡。</div>
+  <div class="grid" id="homeGrid"></div>
+  <div class="card"><h3>就诊提醒</h3><div id="homeRemind" class="empty">暂无提醒</div></div>
+  <div class="card"><h3>停诊/排班通知</h3><div id="homeNotice"></div></div>
+</div>
+
+<!-- ===== 挂号(科室/医生) ===== -->
+<div class="panel" id="p-reg">
+  <div class="card"><h3>选择科室 · 医生列表</h3><div class="tabs" id="deptTabs"></div><div id="docList"></div></div>
+</div>
+
+<!-- ===== 出诊排班 ===== -->
+<div class="panel" id="p-sched">
+  <div class="card"><h3>医生出诊排班(未来7天)</h3><div class="tabs" id="schedTabs"></div><div id="schedList"></div></div>
+</div>
+
+<!-- ===== 在线问诊 ===== -->
+<div class="panel" id="p-chat"><div class="card">
+  <h3>在线问诊 · 简易咨询入口</h3>
+  <div class="notice">互联网诊疗仅作健康咨询，不作为诊断依据；急危重症请拨打 120。</div>
+  <div class="chatbox" id="chatBox"></div>
+  <div style="display:flex;gap:8px"><input id="chatIn" placeholder="描述您的症状…" style="flex:1;margin:0"><button class="btn" onclick="sendChat()">发送</button></div>
+  <div style="margin-top:8px">
+    <span class="chip" onclick="quickChat('最近感冒发烧怎么处理？')">感冒发烧</span>
+    <span class="chip" onclick="quickChat('头痛需要做什么检查？')">头痛检查</span>
+    <span class="chip" onclick="quickChat('如何预约胃镜？')">预约胃镜</span>
+    <span class="chip" onclick="quickChat('报告多久能出来？')">报告时间</span>
+  </div>
+</div></div>
+
+<!-- ===== 检查检验 ===== -->
+<div class="panel" id="p-exam">
+  <div class="card"><h3>检查检验项目查询</h3><input id="examKw" placeholder="搜索项目名称，如 血常规/CT" oninput="renderExam()"><div id="examList"></div></div>
+  <div class="card"><h3>开单模拟</h3><div class="notice">选择项目 → 生成申请单 → 前往缴费。</div><div id="orderItems"></div>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="createExamOrder()">生成检查申请单</button><button class="btn ghost" onclick="clearExamOrder()">清空</button></div></div>
+</div>
+
+<!-- ===== 报告查询 ===== -->
+<div class="panel" id="p-report"><div class="card"><h3>检查检验报告查询</h3><div id="reportList" class="empty">暂无报告</div></div></div>
+
+<!-- ===== 缴费中心 ===== -->
+<div class="panel" id="p-pay">
+  <div class="card"><h3>待缴费清单</h3><div id="payList" class="empty">暂无待缴费用</div></div>
+  <div class="card"><h3>缴费记录</h3><div id="paidList" class="empty">暂无记录</div></div>
+</div>
+
+<!-- ===== 就诊档案 ===== -->
+<div class="panel" id="p-file">
+  <div class="card"><h3>就诊记录 / 历史处方</h3><div id="visitList" class="empty">暂无就诊记录</div></div>
+  <div class="card"><h3>检查报告档案</h3><div id="fileReport" class="empty">暂无报告</div></div>
+</div>
+
+<!-- ===== 消息通知 ===== -->
+<div class="panel" id="p-msg"><div class="card"><h3>消息通知 <button class="btn sm ghost" style="float:right" onclick="clearMsg()">全部已读</button></h3><div id="msgList" class="empty">暂无消息</div></div></div>
+
+<!-- ===== 我的(注册/实名/就诊人/挂号管理) ===== -->
+<div class="panel" id="p-mine">
+  <div class="card" id="loginCard"><h3>患者注册 / 登录</h3>
+    <label>手机号</label><input id="mPhone" maxlength="11" placeholder="11 位手机号">
+    <label>密码</label><input id="mPwd" type="password" placeholder="不少于 6 位">
+    <label>姓名(实名)</label><input id="mName" placeholder="真实姓名">
+    <label>身份证号(实名认证)</label><input id="mIdno" maxlength="18" placeholder="18 位身份证号">
+    <button class="btn" onclick="doRegister()">注册并登录</button>
+    <button class="btn ghost" onclick="fillDemo()">填入演示账号</button>
+  </div>
+  <div class="card" id="userCard" style="display:none"><h3>我的账户 · 实名认证</h3>
+    <div class="row"><span>姓名 / 手机</span><span id="uName"></span></div>
+    <div class="row"><span>实名认证</span><span id="uAuth"></span></div>
+    <div class="row"><span>身份证号</span><span id="uIdno" class="sub"></span></div>
+    <button class="btn sm danger" onclick="logout()" style="margin-top:8px">退出登录</button>
+  </div>
+  <div class="card" id="patCard" style="display:none"><h3>就诊人管理(多人绑定) <button class="btn sm" style="float:right" onclick="openPat()">+ 添加就诊人</button></h3><div id="patList"></div></div>
+  <div class="card"><h3>我的挂号(改期/取消)</h3><div id="myReg" class="empty">暂无挂号记录</div></div>
+</div>
+
+<!-- ===== 弹窗 & 底部导航 ===== -->
+<div class="mask" id="mask"><div class="modal" id="modalBox"></div></div>
+<div class="tabbar">
+  <div class="on" onclick="switchView('home')"><span>🏠</span>首页</div>
+  <div onclick="switchView('reg')"><span>📋</span>挂号</div>
+  <div onclick="switchView('chat')"><span>💬</span>问诊</div>
+  <div onclick="switchView('pay')"><span>💰</span>缴费</div>
+  <div onclick="switchView('msg')"><span>🔔</span>消息<b class="badge" id="msgBadge" style="display:none"></b></div>
+  <div onclick="switchView('mine')"><span>👤</span>我的</div>
+</div>
+
+<script>
+/* =========================================================================
+ * 医院智慧挂号就诊检查系统 · 单页前端 + Mock 后端接口层
+ * 分层: DB(数据层,localStorage持久化) → API(接口层,模拟REST) → View(视图层)
+ * 零外部依赖, 可直接部署或二次开发对接真实后端(替换API函数体为fetch即可)
+ * ========================================================================= */
+
+/* ---------- 1. 数据层 DB ---------- */
+const DB_KEY='hosp_sys_v1';
+const DB=(()=>{try{return JSON.parse(localStorage.getItem(DB_KEY))||{}}catch(e){return{}}})();
+function save(){localStorage.setItem(DB_KEY,JSON.stringify(DB))}
+if(!DB.seeded){DB.users=[];DB.pats=[];DB.regs=[];DB.orders=[];DB.pays=[];
+  DB.visits=[];DB.reports=[];DB.msgs=[];DB.seeded=true;save()}
+
+/* 基础数据：10科室 / 12医生 / 10检查项目 / 10时段 */
+const DEPTS=[{id:'d1',n:'心血管内科'},{id:'d2',n:'呼吸与危重症医学科'},{id:'d3',n:'消化内科'},
+{id:'d4',n:'骨科'},{id:'d5',n:'儿科'},{id:'d6',n:'妇产科'},{id:'d7',n:'神经内科'},
+{id:'d8',n:'皮肤科'},{id:'d9',n:'眼科'},{id:'d10',n:'耳鼻喉科'}];
+const DOCTORS=[
+ {id:'g1',d:'d1',n:'王建国',t:'主任医师',r:'教授/博导',exp:28,s:'冠心病介入治疗、高血压个体化诊疗',fee:50},
+ {id:'g2',d:'d1',n:'李慧',t:'副主任医师',r:'硕士',exp:15,s:'心律失常、心力衰竭',fee:35},
+ {id:'g3',d:'d2',n:'张伟',t:'主任医师',r:'教授',exp:30,s:'慢阻肺、肺部感染、支气管镜',fee:50},
+ {id:'g4',d:'d3',n:'刘芳',t:'副主任医师',r:'博士',exp:14,s:'胃炎、消化性溃疡、胃肠镜',fee:35},
+ {id:'g5',d:'d4',n:'陈强',t:'主任医师',r:'教授',exp:25,s:'关节置换、运动损伤',fee:50},
+ {id:'g6',d:'d5',n:'赵敏',t:'副主任医师',r:'硕士',exp:16,s:'儿童呼吸道感染、生长发育评估',fee:35},
+ {id:'g7',d:'d6',n:'孙丽',t:'主任医师',r:'教授',exp:22,s:'高危妊娠管理、妇科微创',fee:50},
+ {id:'g8',d:'d7',n:'周涛',t:'副主任医师',r:'博士',exp:13,s:'脑卒中、头痛头晕',fee:35},
+ {id:'g9',d:'d8',n:'吴静',t:'主治医师',r:'硕士',exp:9,s:'痤疮、湿疹、皮肤美容',fee:20},
+ {id:'g10',d:'d9',n:'郑明',t:'主任医师',r:'教授',exp:26,s:'白内障超声乳化、眼底激光',fee:50},
+ {id:'g11',d:'d10',n:'冯雪',t:'主治医师',r:'硕士',exp:8,s:'过敏性鼻炎、中耳炎',fee:20},
+ {id:'g12',d:'d5',n:'许阳',t:'主治医师',r:'本科',exp:7,s:'儿童消化、新生儿黄疸',fee:20}];
+const EXAMS=[
+ {id:'e1',n:'血常规五分类',p:28,dept:'检验科',prep:'空腹或餐后均可',dur:'30分钟'},
+ {id:'e2',n:'肝功能十一项',p:112,dept:'检验科',prep:'需空腹8小时',dur:'2小时'},
+ {id:'e3',n:'肾功能三项',p:45,dept:'检验科',prep:'需空腹',dur:'2小时'},
+ {id:'e4',n:'胸部CT平扫',p:260,dept:'放射科',prep:'去除金属物品',dur:'30分钟'},
+ {id:'e5',n:'上腹部彩超',p:130,dept:'超声科',prep:'空腹8小时',dur:'30分钟'},
+ {id:'e6',n:'心电图',p:25,dept:'功能科',prep:'静息5分钟',dur:'10分钟'},
+ {id:'e7',n:'胃镜检查',p:480,dept:'消化内镜',prep:'空腹、停抗凝药',dur:'1天'},
+ {id:'e8',n:'糖化血红蛋白',p:65,dept:'检验科',prep:'无需空腹',dur:'2小时'},
+ {id:'e9',n:'尿常规',p:12,dept:'检验科',prep:'留取中段尿',dur:'30分钟'},
+ {id:'e10',n:'核磁共振(颅脑)',p:680,dept:'放射科',prep:'去除金属物品',dur:'1天'}];
+const SLOTS=['08:00-08:30','08:30-09:00','09:00-09:30','09:30-10:00','10:00-10:30',
+'10:30-11:00','14:00-14:30','14:30-15:00','15:00-15:30','15:30-16:00'];
+const NOTICES=['【停诊通知】张伟 主任医师 本周五下午停诊，已预约患者请改期。',
+'【排班更新】心血管内科下周新增周六上午门诊。',
+'【节假日】国庆期间门诊安排：10/1-10/3 急诊，10/4 起正常门诊。'];
+
+/* ---------- 2. 接口层 API(统一 {code:0,data} / {code:1,msg} 协议) ---------- */
+const API={
+ /* --- 用户注册/会话/实名认证 --- */
+ user_register(p){
+  if(!/^1\d{10}$/.test(p.phone))return err('手机号格式不正确');
+  if((p.pwd||'').length<6)return err('密码不少于6位');
+  if(!p.name)return err('请填写真实姓名');
+  if(!/^\d{17}[\dXx]$/.test(p.idno))return err('身份证号格式不正确');
+  if(DB.users.some(u=>u.phone===p.phone))return err('该手机号已注册');
+  const u={id:'u'+Date.now(),phone:p.phone,name:p.name,idno:mask(p.idno),auth:true,regAt:today()};
+  DB.users.push(u);DB.cur=u.id;save();
+  pushMsg('注册成功','欢迎 '+u.name+'，实名认证已同步完成。');return ok(u)},
+ user_cur(){return ok(DB.users.find(u=>u.id===DB.cur)||null)},
+ user_logout(){DB.cur=null;save();return ok()},
+ /* --- 就诊人(多人绑定, 最多6位) --- */
+ pat_add(p){if(!p.name)return err('请填写就诊人姓名');
+  if(!/^\d{17}[\dXx]$/.test(p.idno))return err('身份证号格式不正确');
+  if(DB.pats.filter(x=>x.uid===DB.cur).length>=6)return err('最多绑定6位就诊人');
+  const pat={id:'p'+Date.now(),uid:DB.cur,name:p.name,idno:mask(p.idno),
+    rel:p.rel||'本人',phone:p.phone||''};
+  DB.pats.push(pat);save();return ok(pat)},
+ pat_list(){return ok(DB.pats.filter(p=>p.uid===DB.cur))},
+ pat_del(id){DB.pats=DB.pats.filter(p=>p.id!==id);save();return ok()},
+ /* --- 科室/医生/排班 --- */
+ doc_list(dept){return ok(DOCTORS.filter(d=>!dept||d.d===dept))},
+ doc_get(id){return ok(DOCTORS.find(d=>d.id===id))},
+ sched_list(docId,date){const list=[];
+  SLOTS.forEach((s,i)=>{const taken=DB.regs.some(r=>r.doc===docId&&r.date===date&&
+    r.slot===s&&r.status!=='已取消');
+    const dow=new Date(date).getDay();const stop=dow===5&&i>=5&&docId==='g3'; /* 模拟周五下午停诊 */
+    list.push({slot:s,state:stop?'停诊':taken?'约满':'有号',left:taken?0:(i%3===0?1:(i%5===0?3:5))})});
+  return ok(list)},
+ /* --- 挂号: 预约/当日/改期/取消 --- */
+ reg_create(p){if(!DB.cur)return err('请先登录');if(!p.patId)return err('请选择就诊人');
+  if(!p.date||!p.slot)return err('请选择日期和时段');
+  if(DB.regs.some(r=>r.doc===p.doc&&r.date===p.date&&r.slot===p.slot&&
+    r.status!=='已取消'&&r.patId===p.patId))return err('该时段已有预约');
+  const doc=DOCTORS.find(d=>d.id===p.doc);const type=p.date===today()?'当日挂号':'预约挂号';
+  const reg={id:'r'+Date.now(),uid:DB.cur,patId:p.patId,doc:p.doc,date:p.date,slot:p.slot,
+    type,fee:doc.fee,status:'待就诊',no:'GH'+Date.now().toString().slice(-8),
+    createdAt:new Date().toLocaleString()};
+  DB.regs.push(reg);
+  /* 挂号成功自动生成待缴挂号费 */
+  DB.pays.push({id:'y'+reg.id,uid:DB.cur,type:'挂号费',ref:reg.id,
+    desc:type+' · '+doc.n+' · '+p.date+' '+p.slot,amount:doc.fee,status:'待支付'});
+  save();pushMsg(type+'成功','【'+doc.n+'】'+p.date+' '+p.slot+'，就诊人：'+
+    getPat(p.patId).name+'，请于就诊前30分钟取号。');
+  return ok(reg)},
+ reg_list(){return ok(DB.regs.filter(r=>r.uid===DB.cur)
+   .sort((a,b)=>b.createdAt.localeCompare(a.createdAt)))},
+ reg_reschedule(id,nd,ns){const r=DB.regs.find(x=>x.id===id);
+  if(!r)return err('挂号不存在');if(r.status!=='待就诊')return err('当前状态不可改期');
+  const old=r.date+' '+r.slot;r.date=nd;r.slot=ns;save();
+  pushMsg('挂号改期成功','原 '+old+' 已改至 '+nd+' '+ns+'。');return ok(r)},
+ reg_cancel(id){const r=DB.regs.find(x=>x.id===id);
+  if(!r)return err('挂号不存在');if(r.status!=='待就诊')return err('当前状态不可取消');
+  r.status='已取消';save();
+  const y=DB.pays.find(p=>p.ref===id&&p.status==='待支付');if(y)y.status='已关闭';
+  pushMsg('挂号已取消','【'+DOCTORS.find(d=>d.id===r.doc).n+'】'+r.date+' '+r.slot+' 已取消。');
+  return ok()},
+ /* --- 检查检验/报告 --- */
+ exam_search(kw){return ok(EXAMS.filter(e=>!kw||e.n.includes(kw)||e.dept.includes(kw)))},
+ report_list(){return ok(DB.reports.filter(r=>r.uid===DB.cur)
+   .sort((a,b)=>b.at.localeCompare(a.at)))},
+ /* --- 缴费中心 --- */
+ pay_list(){return ok(DB.pays.filter(p=>p.uid===DB.cur))},
+ pay_do(id){const p=DB.pays.find(x=>x.id===id);
+  if(!p||p.status!=='待支付')return err('账单状态异常');
+  p.status='已支付';p.paidAt=new Date().toLocaleString();save();
+  pushMsg('缴费成功',p.type+' ¥'+p.amount+' 支付成功。');
+  /* 检查费支付后模拟出报告 */
+  if(p.type==='检查费'){const o=DB.orders.find(x=>x.id===p.ref);
+    if(o)o.items.forEach(eid=>{const e=EXAMS.find(x=>x.id===eid);
+      DB.reports.push({id:'rp'+Math.random().toString(36).slice(2,8),uid:DB.cur,
+        exam:e.n,dept:e.dept,at:new Date().toLocaleString(),result:genResult(e),doctor:'李明'})});
+    save();pushMsg('报告已发布','您的检查报告已出，请前往「报告查询」查看。')}
+  return ok(p)},
+ /* --- 就诊档案/消息 --- */
+ visit_list(){return ok(DB.visits.filter(v=>v.uid===DB.cur))},
+ msg_list(){return ok(DB.msgs.filter(m=>m.uid===DB.cur)
+   .sort((a,b)=>b.at.localeCompare(a.at)))},
+ msg_readAll(){DB.msgs.filter(m=>m.uid===DB.cur).forEach(m=>m.read=true);save();return ok()},
+ msg_unread(){return ok(DB.msgs.filter(m=>m.uid===DB.cur&&!m.read).length)}};
+/* 协议与工具函数 */
+function ok(d){return{code:0,data:d}}
+function err(m){return{code:1,msg:m}}
+function mask(s){return s.slice(0,6)+'********'+s.slice(-4)}
+function today(){return new Date().toISOString().slice(0,10)}
+function getPat(id){return DB.pats.find(p=>p.id===id)||{name:'-'}}
+function pushMsg(t,c){DB.msgs.push({id:'m'+Date.now()+Math.random(),uid:DB.cur||'sys',
+  title:t,content:c,at:new Date().toLocaleString(),read:false});save();renderMsgBadge()}
+
+/* ---------- 3. 视图层 View ---------- */
+const VIEWS=['home','reg','sched','chat','exam','report','pay','file','msg','mine'];
+let curView='home',curDept='',pending=null;
+function switchView(v){curView=v;
+  VIEWS.forEach(x=>document.getElementById('p-'+x).classList.toggle('active',x===v));
+  document.querySelectorAll('.tabbar div').forEach((d,i)=>
+    d.classList.toggle('on',['home','reg','chat','pay','msg','mine'][i]===v));
+  render(v)}
+function render(v){({home:renderHome,reg:renderReg,sched:renderSched,chat:renderChat,
+  exam:renderExam,report:renderReport,pay:renderPay,file:renderFile,
+  msg:renderMsg,mine:renderMine}[v]||(()=>{}))()}
+
+/* ===== 首页：宫格 + 就诊提醒 + 停诊通知 ===== */
+const HOME_GRID=[['reg','📋','预约挂号'],['reg','⚡','当日挂号'],['sched','🗓','出诊排班'],
+ ['mine','👥','就诊人'],['chat','💬','在线问诊'],['exam','🔬','检查检验'],
+ ['report','📄','报告查询'],['pay','💰','缴费中心'],['file','📁','就诊档案'],
+ ['file','💊','历史处方'],['msg','🔔','消息通知'],['mine','🪪','实名认证']];
+function renderHome(){
+  document.getElementById('homeGrid').innerHTML=HOME_GRID.map(g=>
+    `<div class="gitem" onclick="switchView('${g[0]}')"><span class="ico">${g[1]}</span><span class="nm">${g[2]}</span></div>`).join('');
+  const up=DB.regs.filter(r=>r.uid===DB.cur&&r.status==='待就诊'&&r.date>=today());
+  document.getElementById('homeRemind').innerHTML=up.length?up.map(r=>{
+    const doc=DOCTORS.find(d=>d.id===r.doc);
+    const diff=(new Date(r.date)-new Date(today()))/86400000;
+    const tag=diff===0?'<span class="tag r">今日</span>':diff<=1?'<span class="tag o">明日</span>':'<span class="tag b">预约</span>';
+    return `<div class="row"><span>${tag} ${doc.n} · ${r.date} ${r.slot}<br>
+    <span class="sub">就诊人：${getPat(r.patId).name} · ${r.no}</span></span>
+    <button class="btn sm warn" onclick="openResched('${r.id}')">改期</button></div>`}).join('')
+    :'<div class="empty">暂无提醒</div>';
+  document.getElementById('homeNotice').innerHTML=NOTICES.map((n,i)=>
+    `<div class="row"><span>${n}</span><span class="tag o">通知${i+1}</span></div>`).join('')}
+
+/* ===== 科室/医生列表 ===== */
+function renderReg(){
+  document.getElementById('deptTabs').innerHTML=
+    `<span class="tab ${!curDept?'on':''}" onclick="setDept('')">全部</span>`+
+    DEPTS.map(d=>`<span class="tab ${curDept===d.id?'on':''}" onclick="setDept('${d.id}')">${d.n}</span>`).join('');
+  const docs=API.doc_list(curDept).data;
+  document.getElementById('docList').innerHTML=docs.map(d=>{
+    const dept=DEPTS.find(x=>x.id===d.d);
+    return `<div class="card" style="margin-bottom:10px"><div style="display:flex;gap:10px">
+      <div style="width:46px;height:46px;background:var(--primary-l);border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-size:20px">👨‍⚕️</div>
+      <div style="flex:1"><b>${d.n}</b> <span class="tag b">${d.t}</span> <span class="tag g">${d.r}</span>
+      <div style="color:var(--muted);font-size:12px;margin:3px 0">${dept.n} · ${d.exp}年经验 ·
+      挂号费 <span class="money">¥${d.fee}</span></div>
+      <div style="font-size:12px;color:#555">擅长：${d.s}</div></div></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn sm" onclick="openSched('${d.id}')">预约挂号</button>
+        <button class="btn sm ok" onclick="openToday('${d.id}')">当日挂号</button>
+        <button class="btn sm ghost" onclick="docIntro('${d.id}')">医生简介</button></div></div>`}).join('')
+    ||'<div class="empty">该科室暂无医生</div>'}
+function setDept(id){curDept=id;renderReg()}
+function docIntro(id){const d=API.doc_get(id).data,dept=DEPTS.find(x=>x.id===d.d);
+  openModal(`<h3>医生简介</h3><div class="row"><span>姓名</span><b>${d.n} ${d.t}</b></div>
+    <div class="row"><span>科室</span><span>${dept.n}</span></div>
+    <div class="row"><span>职称/学历</span><span>${d.t} · ${d.r}</span></div>
+    <div class="row"><span>从业年限</span><span>${d.exp} 年</span></div>
+    <div class="row"><span>挂号费</span><span class="money">¥${d.fee}</span></div>
+    <div style="padding:10px 0;font-size:13px;line-height:1.8"><b>擅长领域：</b>${d.s}。</div>
+    <button class="btn ghost" onclick="closeModal()">关闭</button>`)}
+
+/* ===== 排班(未来7天) ===== */
+function nextDays(n){const a=[];const w=['周日','周一','周二','周三','周四','周五','周六'];
+  for(let i=0;i<n;i++){const d=new Date();d.setDate(d.getDate()+i);
+    a.push({date:d.toISOString().slice(0,10),label:(i===0?'今天':i===1?'明天':w[d.getDay()])})}
+  return a}
+function openSched(docId){pending={doc:docId,mode:'预约',date:nextDays(7)[0].date};
+  switchView('sched');renderSched()}
+function openToday(docId){pending={doc:docId,mode:'当日',date:today()};
+  switchView('reg');openDatePick(docId,today(),'当日挂号')}
+function renderSched(){const days=nextDays(7);
+  if(!pending)pending={doc:DOCTORS[0].id,mode:'预约',date:days[0].date};
+  if(!pending.date)pending.date=days[0].date;
+  document.getElementById('schedTabs').innerHTML=days.map(d=>
+    `<span class="tab ${pending.date===d.date?'on':''}" onclick="pickSched('${d.date}')">
+    ${d.label}<br><small>${d.date.slice(5)}</small></span>`).join('');
+  renderSchedList()}
+function pickSched(dt){pending.date=dt;renderSched()}
+function renderSchedList(){const doc=API.doc_get(pending.doc).data;const date=pending.date;
+  const slots=API.sched_list(pending.doc,date).data;
+  document.getElementById('schedList').innerHTML=
+    `<div class="card" style="background:var(--primary-l)"><b>${doc.n}</b> ${doc.t} ·
+     挂号费 ¥${doc.fee} · ${date}</div><div>${slots.map(s=>{
+     const act=s.state==='有号'?`onclick="openReg('${pending.doc}','${date}','${s.slot}')"`:'';
+     return `<span class="chip ${s.state==='有号'?'on':'off'}" ${act}>${s.slot} · ${s.state}${s.state==='有号'?'(余'+s.left+')':''}</span>`}).join('')}</div>
+   <div class="notice" style="margin-top:10px">点击时段 → 选择就诊人 → 确认挂号 → 前往缴费中心支付挂号费。</div>`}
+function openDatePick(docId,date,title){pending={doc:docId,date,mode:title};
+  const slots=API.sched_list(docId,date).data;const doc=API.doc_get(docId).data;
+  openModal(`<h3>${title} · ${doc.n}</h3><label>选择日期</label>
+    <select id="pickDate" onchange="repick(this.value)">${nextDays(7).map(d=>
+      `<option value="${d.date}" ${d.date===date?'selected':''}>${d.date}(${d.label})</option>`).join('')}</select>
+    <label>选择时段</label><div>${slots.map(s=>s.state==='有号'?
+      `<span class="chip" onclick="openReg('${docId}',document.getElementById('pickDate').value,'${s.slot}')">${s.slot}</span>`:
+      `<span class="chip off">${s.slot}·${s.state}</span>`).join('')}</div>
+    <button class="btn ghost" onclick="closeModal()">取消</button>`)}
+function repick(v){openDatePick(pending.doc,v,pending.mode)}
+
+/* ===== 确认挂号 ===== */
+function openReg(docId,date,slot){
+  if(!DB.cur){closeModal();switchView('mine');alert('请先注册/登录');return}
+  const pats=API.pat_list().data;
+  if(!pats.length){openModal(`<h3>添加首位就诊人</h3>${patForm()}
+    <button class="btn" onclick="savePatThenReg('${docId}','${date}','${slot}')">保存并继续挂号</button>`);return}
+  showRegConfirm(docId,date,slot,pats)}
+function showRegConfirm(docId,date,slot,pats){const doc=API.doc_get(docId).data;
+  openModal(`<h3>确认${date===today()?'当日':'预约'}挂号</h3>
+    <div class="row"><span>医生</span><b>${doc.n} ${doc.t}</b></div>
+    <div class="row"><span>时间</span><b>${date} ${slot}</b></div>
+    <div class="row"><span>挂号费</span><span class="money">¥${doc.fee}</span></div>
+    <label>选择就诊人</label><select id="regPat">${pats.map(p=>
+      `<option value="${p.id}">${p.name}(${p.rel}) ${p.idno}</option>`).join('')}</select>
+    <button class="btn" onclick="doReg('${docId}','${date}','${slot}')">确认挂号</button>
+    <button class="btn ghost" onclick="closeModal()">取消</button>`)}
+function doReg(docId,date,slot){
+  const res=API.reg_create({doc:docId,date,slot,patId:document.getElementById('regPat').value});
+  if(res.code){alert(res.msg);return}
+  closeModal();
+  openModal(`<h3>✅ 挂号成功</h3><div class="row"><span>流水号</span><b>${res.data.no}</b></div>
+    <div class="row"><span>就诊时间</span><b>${date} ${slot}</b></div>
+    <div class="notice">挂号费已生成待缴费账单，请前往「缴费中心」完成支付，逾期 30 分钟自动取消。</div>
+    <button class="btn" onclick="closeModal();switchView('pay')">去缴费</button>
+    <button class="btn ghost" onclick="closeModal()">完成</button>`);
+  render(curView)}
+function savePatThenReg(docId,date,slot){
+  const r=API.pat_add(patVal());
+  if(r.code){alert(r.msg);return}
+  showRegConfirm(docId,date,slot,API.pat_list().data)}
+
+/* ===== 改期/取消 ===== */
+function openResched(id){const r=DB.regs.find(x=>x.id===id);const d0=nextDays(7)[0].date;
+  const slots=API.sched_list(r.doc,d0).data;
+  openModal(`<h3>预约改期</h3><div class="row"><span>原预约</span><b>${r.date} ${r.slot}</b></div>
+    <label>改至日期</label><select id="rsDate" onchange="rsSlots('${id}',this.value)">${nextDays(7).map(d=>
+      `<option value="${d.date}">${d.date}(${d.label})</option>`).join('')}</select>
+    <label>新时段</label><div id="rsSlots">${slots.map(s=>s.state==='有号'?
+      `<span class="chip" onclick="doResched('${id}','${d0}','${s.slot}')">${s.slot}</span>`:
+      `<span class="chip off">${s.slot}</span>`).join('')}</div>
+    <button class="btn ghost" onclick="closeModal()">取消</button>`)}
+function rsSlots(id,date){const r=DB.regs.find(x=>x.id===id);
+  document.getElementById('rsSlots').innerHTML=API.sched_list(r.doc,date).data.map(s=>
+    s.state==='有号'?`<span class="chip" onclick="doResched('${id}','${date}','${s.slot}')">${s.slot}</span>`:
+    `<span class="chip off">${s.slot}</span>`).join('')}
+function doResched(id,date,slot){const res=API.reg_reschedule(id,date,slot);
+  if(res.code){alert(res.msg);return}
+  closeModal();alert('改期成功：'+date+' '+slot);render(curView)}
+function doCancel(id){if(!confirm('确认取消该挂号？'))return;
+  const res=API.reg_cancel(id);alert(res.code?res.msg:'已取消');render(curView)}
+
+/* ===== 就诊人表单 ===== */
+function patForm(){return `<label>姓名</label><input id="ptName" placeholder="就诊人真实姓名">
+  <label>身份证号</label><input id="ptId" maxlength="18" placeholder="18位身份证号">
+  <label>与本人关系</label><select id="ptRel"><option>本人</option><option>父亲</option><option>母亲</option>
+    <option>配偶</option><option>子女</option><option>其他</option></select>
+  <label>手机号(选填)</label><input id="ptPh" maxlength="11" placeholder="就诊人手机号">`}
+function patVal(){return{name:document.getElementById('ptName').value.trim(),
+  idno:document.getElementById('ptId').value.trim(),
+  rel:document.getElementById('ptRel').value,
+  phone:document.getElementById('ptPh').value.trim()}}
+function openPat(){openModal(`<h3>添加就诊人</h3>${patForm()}
+  <button class="btn" onclick="doAddPat()">保存</button>
+  <button class="btn ghost" onclick="closeModal()">取消</button>`)}
+function doAddPat(){const r=API.pat_add(patVal());
+  if(r.code){alert(r.msg);return}
+  closeModal();renderMine();alert('就诊人添加成功')}
+
+/* ===== 在线问诊(关键词规则AI导诊) ===== */
+function renderChat(){if(!document.getElementById('chatBox').innerHTML)
+  addChat('sys','您好，我是智能导诊助手。请描述症状，或点击下方常见问题快速咨询。')}
+function addChat(who,text){const box=document.getElementById('chatBox');
+  box.innerHTML+=`<div class="bubble ${who==='me'?'me':'sys'}">
+    <div class="b">${text}<div class="who">${who==='me'?'我':'医生助理'} · ${new Date().toLocaleTimeString()}</div></div></div>`;
+  box.scrollTop=box.scrollHeight}
+function sendChat(){const v=document.getElementById('chatIn').value.trim();
+  if(!v)return;addChat('me',v);document.getElementById('chatIn').value='';
+  setTimeout(()=>addChat('sys',replyAI(v)),500)}
+function quickChat(t){switchView('chat');document.getElementById('chatIn').value=t;sendChat()}
+function replyAI(q){const rules=[
+  [/发烧|感冒|咳嗽|流涕/,'建议：测量体温，体温≥38.5℃可服用对乙酰氨基酚；多饮水。若持续3天不退请到呼吸内科就诊。'],
+  [/头痛|头晕/,'建议：先测血压。若突发剧烈头痛伴呕吐请立即急诊。常规头痛可预约神经内科。'],
+  [/胃|胃镜|恶心|胃痛/,'建议：胃镜需空腹8小时。可挂消化内科，检查费约¥480。'],
+  [/皮肤|湿疹|痘|疹/,'建议：皮肤科门诊面诊，避免搔抓。可预约吴静主治医师(¥20)。'],
+  [/报告|结果/,'报告一般在缴费完成后2小时发布，可在「报告查询」查看。']];
+  for(const[r,a]of rules)if(r.test(q))return a;
+  return '已收到。根据描述暂无法定位科室，建议先挂「全科门诊」初步评估。如症状紧急请拨打120。'}
+
+/* ===== 检查检验 + 开单模拟 ===== */
+let examOrder=[];
+function renderExam(){const kw=document.getElementById('examKw').value.trim();
+  const list=API.exam_search(kw).data;
+  document.getElementById('examList').innerHTML=list.map(e=>{const on=examOrder.includes(e.id);
+    return `<div class="row"><span>${e.n}<br><span class="sub">${e.dept} · ${e.prep} · 出报告${e.dur}</span></span>
+      <span style="text-align:right"><span class="money">¥${e.p}</span><br>
+      <button class="btn sm ${on?'ok':'ghost'}" onclick="toggleExam('${e.id}')">${on?'已选 ✓':'加入开单'}</button></span></div>`}).join('')
+    ||'<div class="empty">未找到相关项目</div>';
+  renderOrder()}
+function toggleExam(id){examOrder.includes(id)?examOrder=examOrder.filter(x=>x!==id):examOrder.push(id);renderExam()}
+function renderOrder(){document.getElementById('orderItems').innerHTML=examOrder.length?
+  examOrder.map(id=>{const e=EXAMS.find(x=>x.id===id);
+    return `<div class="row"><span>${e.n}</span><span class="money">¥${e.p}</span></div>`}).join('')+
+  `<div class="row"><b>合计</b><b class="money">¥${examOrder.reduce((s,id)=>s+EXAMS.find(x=>x.id===id).p,0)}</b></div>`
+  :'<div class="empty" style="padding:10px">尚未选择项目</div>'}
+function clearExamOrder(){examOrder=[];renderExam()}
+function createExamOrder(){if(!DB.cur){switchView('mine');alert('请先登录');return}
+  if(!examOrder.length){alert('请先加入检查项目');return}
+  const amt=examOrder.reduce((s,id)=>s+EXAMS.find(x=>x.id===id).p,0);
+  const o={id:'o'+Date.now(),uid:DB.cur,items:[...examOrder],amount:amt,
+    at:new Date().toLocaleString(),status:'待缴费'};
+  DB.orders.push(o);
+  DB.pays.push({id:'y'+o.id,uid:DB.cur,type:'检查费',ref:o.id,
+    desc:examOrder.map(id=>EXAMS.find(x=>x.id===id).n).join('、'),amount:amt,status:'待支付'});
+  save();pushMsg('检查申请单已生成','共'+examOrder.length+'项，合计¥'+amt+'，请尽快缴费。');
+  examOrder=[];renderExam();alert('申请单已生成，请前往缴费中心支付');switchView('pay')}
+
+/* ===== 报告(按项目预置结果模板) ===== */
+function genResult(e){const R={'血常规五分类':'WBC 6.2×10⁹/L ↑，Hb 138g/L —— 白细胞略高，建议复查',
+  '肝功能十一项':'ALT 28U/L —— 未见明显异常','肾功能三项':'BUN 5.1mmol/L —— 正常',
+  '胸部CT平扫':'两肺纹理清晰 —— 未见活动性病变','上腹部彩超':'肝胆胰脾未见明显异常 —— 正常',
+  '心电图':'窦性心律78次/分 —— 正常心电图','胃镜检查':'胃窦黏膜充血水肿，HP(+) —— 慢性浅表性胃炎',
+  '糖化血红蛋白':'HbA1c 6.2% —— 偏高，建议控制饮食','尿常规':'PRO(-) —— 正常',
+  '核磁共振(颅脑)':'脑实质内未见异常信号 —— 正常'};
+  return R[e.n]||'各项指标在参考范围内'}
+function renderReport(){const list=API.report_list().data;
+  document.getElementById('reportList').innerHTML=list.length?list.map(r=>
+    `<div class="card" style="margin-bottom:10px;background:#fbfdff">
+      <div class="row"><span>📇 ${r.exam}</span><span class="tag g">已审核</span></div>
+      <div class="row"><span class="sub">科室：${r.dept} · 报告医师：${r.doctor} · ${r.at}</span></div>
+      <div style="background:#fff;padding:10px;border-radius:8px;font-size:13px;
+      line-height:1.7;margin-top:6px"><b>检查结果：</b>${r.result}</div></div>`).join('')
+    :'<div class="empty">暂无报告，完成检查并缴费后 2 小时可查看</div>'}
+
+/* ===== 缴费中心(挂号费/检查费) ===== */
+function renderPay(){const all=API.pay_list().data;
+  const wait=all.filter(p=>p.status==='待支付');const done=all.filter(p=>p.status!=='待支付');
+  document.getElementById('payList').innerHTML=wait.length?wait.map(p=>
+    `<div class="row"><span>${p.desc}<br><span class="sub">${p.type}</span></span>
+    <span style="text-align:right"><span class="money">¥${p.amount}</span><br>
+    <button class="btn sm" onclick="doPay('${p.id}')">立即支付</button></span></div>`).join('')+
+    `<div class="row"><b>合计待缴</b><b class="money">¥${wait.reduce((s,p)=>s+p.amount,0)}</b></div>
+     <button class="btn ok" style="width:100%;margin-top:8px" onclick="payAll()">一键结清全部</button>`
+    :'<div class="empty">暂无待缴费用</div>';
+  document.getElementById('paidList').innerHTML=done.length?done.map(p=>
+    `<div class="row"><span>${p.desc}<br><span class="sub">${p.type} · ${p.paidAt||'已关闭'}</span></span>
+    <span style="text-align:right"><span style="color:${p.status==='已支付'?'var(--red)':'#999'}">¥${p.amount}</span><br>
+    <span class="tag ${p.status==='已支付'?'g':'r'}">${p.status}</span></span></div>`).join('')
+    :'<div class="empty">暂无记录</div>'}
+function doPay(id){const res=API.pay_do(id);alert(res.code?res.msg:'缴费成功');renderPay()}
+function payAll(){const wait=API.pay_list().data.filter(p=>p.status==='待支付');
+  wait.forEach(p=>API.pay_do(p.id));alert('已结清 '+wait.length+' 笔费用');renderPay()}
+
+/* ===== 就诊档案(就诊记录/历史处方/报告) ===== */
+function renderFile(){const visits=API.visit_list().data;
+  document.getElementById('visitList').innerHTML=visits.length?visits.map(v=>
+    `<div class="card" style="margin-bottom:10px">
+      <div class="row"><span>${v.date} · ${v.dept}</span><span class="tag b">${v.doctor}</span></div>
+      <div class="row"><span>诊断</span><b>${v.diag}</b></div>
+      <div class="row"><span class="sub">历史处方：${v.rx}</span></div></div>`).join('')
+    :'<div class="empty">暂无就诊记录</div>';
+  const reports=API.report_list().data;
+  document.getElementById('fileReport').innerHTML=reports.length?reports.map(r=>
+    `<div class="row"><span>${r.exam}<br><span class="sub">${r.at}</span></span>
+     <button class="btn sm ghost" onclick="switchView('report')">查看</button></div>`).join('')
+    :'<div class="empty">暂无报告</div>'}
+
+/* ===== 消息通知(挂号/缴费/报告/停诊) ===== */
+function renderMsg(){const list=API.msg_list().data;
+  document.getElementById('msgList').innerHTML=list.length?list.map(m=>
+    `<div class="row" style="align-items:flex-start">
+    <span><b style="color:${m.read?'#555':'var(--primary)'}">${m.read?'':'● '}${m.title}</b><br>
+    <span class="sub">${m.content}</span><br><span class="sub">${m.at}</span></span>
+    ${m.read?'':'<span class="tag r">未读</span>'}</div>`).join('')
+    :'<div class="empty">暂无消息</div>';
+  renderMsgBadge()}
+function clearMsg(){API.msg_readAll();renderMsg()}
+function renderMsgBadge(){const n=API.msg_unread().data;
+  const b=document.getElementById('msgBadge');
+  if(n){b.style.display='inline';b.textContent=n}else b.style.display='none'}
+
+/* ===== 我的(注册/实名/就诊人/挂号管理) ===== */
+function renderMine(){const u=API.user_cur().data;
+  document.getElementById('topUser').textContent=u?u.name+' ▾':'未登录';
+  document.getElementById('loginCard').style.display=u?'none':'block';
+  document.getElementById('userCard').style.display=u?'block':'none';
+  document.getElementById('patCard').style.display=u?'block':'none';
+  if(u){document.getElementById('uName').textContent=u.name+' · '+u.phone;
+    document.getElementById('uAuth').innerHTML=u.auth?'<span class="tag g">已实名认证 ✓</span>':
+      '<span class="tag r">未认证</span>';
+    document.getElementById('uIdno').textContent=u.idno;
+    const pats=API.pat_list().data;
+    document.getElementById('patList').innerHTML=pats.length?pats.map(p=>
+      `<div class="row"><span>${p.name} <span class="tag b">${p.rel}</span><br>
+      <span class="sub">${p.idno} · ${p.phone||'-'}</span></span>
+      <button class="btn sm danger" onclick="delPat('${p.id}')">解绑</button></div>`).join('')
+      :'<div class="empty">还没有就诊人，点击右上角添加</div>'}
+  const regs=API.reg_list().data;
+  document.getElementById('myReg').innerHTML=regs.length?regs.map(r=>{
+    const doc=DOCTORS.find(d=>d.id===r.doc);
+    const cls=r.status==='待就诊'?'o':r.status==='已取消'?'r':'g';
+    return `<div class="row"><span>${r.type} <span class="tag ${cls}">${r.status}</span><br>
+      <b>${doc.n}</b> · ${r.date} ${r.slot} · ¥${r.fee}<br>
+      <span class="sub">流水号 ${r.no} · 就诊人 ${getPat(r.patId).name}</span></span>
+      <span>${r.status==='待就诊'?`<button class="btn sm warn" onclick="openResched('${r.id}')">改期</button>
+      <button class="btn sm danger" onclick="doCancel('${r.id}')">取消</button>`:'-'}</span></div>`}).join('')
+    :'<div class="empty">暂无挂号记录</div>'}
+function fillDemo(){document.getElementById('mPhone').value='13800138000';
+  document.getElementById('mPwd').value='demo123';
+  document.getElementById('mName').value='张三';
+  document.getElementById('mIdno').value='510101199001011234'}
+function doRegister(){const res=API.user_register({phone:document.getElementById('mPhone').value.trim(),
+  pwd:document.getElementById('mPwd').value,name:document.getElementById('mName').value.trim(),
+  idno:document.getElementById('mIdno').value.trim()});
+  if(res.code){alert(res.msg);return}
+  alert('注册成功,已自动登录');renderMine();renderMsgBadge()}
+function logout(){API.user_logout();renderMine();renderMsgBadge();switchView('home')}
+function delPat(id){if(!confirm('确认解绑该就诊人？'))return;API.pat_del(id);renderMine()}
+
+/* ===== 弹窗工具 ===== */
+function openModal(html){document.getElementById('modalBox').innerHTML=html;
+  document.getElementById('mask').classList.add('open')}
+function closeModal(){document.getElementById('mask').classList.remove('open')}
+document.getElementById('mask').onclick=e=>{if(e.target.id==='mask')closeModal()};
+
+/* ---------- 4. 启动 ---------- */
+renderHome();renderMsgBadge();renderMine();
+</script>
+</body>
+</html>
