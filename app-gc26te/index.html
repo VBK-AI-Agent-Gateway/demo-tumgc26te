@@ -3,129 +3,259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>随机颜色生成器</title>
+<title>58同城 - 本地生活信息分类门户</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#111;transition:background .45s ease;padding:20px}
-.card{background:#ffffffee;border-radius:24px;padding:44px 40px;text-align:center;box-shadow:0 20px 60px #00000066;max-width:420px;width:100%}
-h1{font-size:24px;color:#222;margin-bottom:6px}
-.sub{font-size:13px;color:#888;margin-bottom:28px}
-.preview{width:150px;height:150px;border-radius:50%;margin:0 auto 26px;box-shadow:0 8px 30px #00000033;transition:background .3s;border:4px solid #fff;outline:2px solid #00000011}
-.hex{font-size:40px;font-weight:800;letter-spacing:3px;color:#222;font-family:ui-monospace,Menlo,Consolas,monospace;margin-bottom:8px;cursor:pointer;user-select:all}
-.hint{font-size:12px;color:#aaa;margin-bottom:24px}
-.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.btn{border:none;border-radius:14px;padding:14px 26px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:1px}
-.btn-main{background:#222;color:#fff;flex:1;min-width:150px}
-.btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 20px #00000044}
-.btn-main:active{transform:scale(.97)}
-.btn-copy{background:#f0f0f0;color:#444}
-.btn-copy:hover{background:#e2e2e2}
-.meta{margin-top:24px;display:flex;justify-content:space-around;font-size:13px;color:#666}
-.meta b{display:block;font-size:16px;color:#222;margin-top:4px;font-family:ui-monospace,monospace}
-.toast{position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 24px;border-radius:20px;font-size:14px;display:none;z-index:99;animation:pop .3s}
-@keyframes pop{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
-.hist{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}
-.dot{width:26px;height:26px;border-radius:50%;cursor:pointer;transition:.15s;border:2px solid #fff;box-shadow:0 2px 6px #00000033}
-.dot:hover{transform:scale(1.2)}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f6f8;color:#222;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.top{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100}
+.top-in{max-width:1160px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:14px 18px}
+.logo{font-size:22px;font-weight:800;color:#ff5500;flex-shrink:0;letter-spacing:1px}
+.city{font-size:14px;background:#fff2ea;color:#ff5500;padding:5px 12px;border-radius:16px;cursor:pointer}
+.search{flex:1;display:flex;background:#f2f3f5;border-radius:20px;overflow:hidden;max-width:520px}
+.search input{flex:1;border:none;background:transparent;outline:none;padding:10px 16px;font-size:14px}
+.search button{background:#ff5500;color:#fff;border:none;padding:0 22px;cursor:pointer;font-size:14px;font-weight:600}
+.top-link{font-size:13px;color:#888;cursor:pointer;white-space:nowrap}
+.top-link:hover{color:#ff5500}
+.container{max-width:1160px;margin:0 auto;padding:22px 18px 60px}
+.hero{background:linear-gradient(120deg,#ff5500,#ff8a3d);border-radius:18px;color:#fff;padding:34px 34px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero h1{font-size:30px;margin-bottom:8px}
+.hero p{font-size:15px;opacity:.95}
+.hero .em{position:absolute;right:34px;top:50%;transform:translateY(-50%);font-size:96px;opacity:.22}
+.hero-tags{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.hero-tags span{background:#ffffff33;padding:6px 14px;border-radius:16px;font-size:13px;cursor:pointer}
+.hero-tags span:hover{background:#ffffff55}
+.sec-title{font-size:20px;font-weight:700;margin:26px 0 16px;display:flex;align-items:center;gap:10px}
+.sec-title::before{content:'';width:5px;height:20px;background:#ff5500;border-radius:3px}
+.sec-title .more{margin-left:auto;font-size:13px;color:#999;font-weight:400;cursor:pointer}
+.sec-title .more:hover{color:#ff5500}
+.grid-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:16px;background:#fff;border-radius:16px;padding:24px 18px}
+.cat{text-align:center;cursor:pointer;transition:.15s;border-radius:12px;padding:10px 4px}
+.cat:hover{background:#fff5f0;transform:translateY(-4px)}
+.cat .ic{font-size:36px;margin-bottom:8px}
+.cat .nm{font-size:14px;font-weight:600}
+.cat .sub{font-size:11px;color:#aaa;margin-top:2px}
+.grid-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.panel{background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 12px #00000008}
+.panel h3{font-size:17px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.panel h3 .badge{font-size:11px;background:#fff2ea;color:#ff5500;padding:2px 9px;border-radius:10px;font-weight:600}
+.rec-list{display:flex;flex-direction:column;gap:12px}
+.rec{display:flex;gap:12px;cursor:pointer;padding:8px;border-radius:10px;transition:.15s}
+.rec:hover{background:#f8f9fb}
+.rec .ic{width:46px;height:46px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px}
+.rec .tx{flex:1;min-width:0}
+.rec .t{font-size:14px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec .d{font-size:12px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec .p{color:#ff3300;font-weight:700;font-size:15px;align-self:center;white-space:nowrap}
+.rec .p small{font-size:11px;font-weight:400;color:#bbb}
+.hot-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hot{background:#f8f9fb;border-radius:12px;padding:14px;cursor:pointer;transition:.15s}
+.hot:hover{background:#fff2ea}
+.hot .i{font-size:26px}
+.hot .n{font-size:14px;font-weight:600;margin-top:6px}
+.hot .s{font-size:11px;color:#999;margin-top:2px}
+.publish-cta{background:linear-gradient(120deg,#1a73e8,#4a90e2);border-radius:16px;color:#fff;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-top:26px;flex-wrap:wrap}
+.publish-cta .tx h3{font-size:22px;margin-bottom:6px}
+.publish-cta .tx p{font-size:14px;opacity:.9}
+.publish-cta .btn{background:#fff;color:#1a73e8;border:none;border-radius:24px;padding:14px 34px;font-size:16px;font-weight:700;cursor:pointer;margin-left:auto;transition:.2s}
+.publish-cta .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px #00000033}
+.footer{max-width:1160px;margin:0 auto;padding:26px 18px;color:#aaa;font-size:12px;line-height:2;border-top:1px solid #eee}
+.footer b{color:#666}
+.mask{position:fixed;inset:0;background:#000000aa;display:none;align-items:center;justify-content:center;z-index:200}
+.mask.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:28px;width:92%;max-width:420px}
+.modal h3{color:#ff5500;font-size:19px;margin-bottom:16px}
+.modal label{display:block;font-size:13px;color:#666;margin:12px 0 6px}
+.modal input,.modal select,.modal textarea{width:100%;border:1px solid #ddd;border-radius:9px;padding:11px 13px;font-size:14px;outline:none;box-sizing:border-box}
+.modal input:focus,.modal textarea:focus,.modal select:focus{border-color:#ff5500}
+.modal .btns{display:flex;gap:10px;margin-top:20px}
+.modal .btns button{flex:1;padding:12px;border-radius:10px;border:none;font-size:15px;cursor:pointer;font-weight:700}
+.b1{background:#ff5500;color:#fff}.b2{background:#f0f0f0;color:#666}
+.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 26px;border-radius:20px;font-size:14px;display:none;z-index:300}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;display:none;border-top:1px solid #eee;z-index:100}
+.tabbar .tb{flex:1;text-align:center;padding:9px 0 7px;font-size:10px;color:#888;cursor:pointer}
+.tabbar .tb .i{font-size:22px;display:block;margin-bottom:2px}
+.tabbar .tb.on{color:#ff5500}
+@media(max-width:760px){
+ .grid-cats{grid-template-columns:repeat(4,1fr);gap:10px;padding:18px 10px}
+ .hero{padding:24px 20px}.hero h1{font-size:22px}.hero .em{display:none}
+ .logo{font-size:18px}.top-link,.city{display:none}
+ .search{max-width:none}
+ .hot-grid{grid-template-columns:1fr 1fr}
+ .publish-cta .btn{margin-left:0;width:100%}
+ .tabbar{display:flex}
+ body{padding-bottom:64px}
+}
 </style>
 </head>
 <body>
-<div class="toast" id="toast"></div>
-<div class="card">
- <h1>🎨 随机颜色生成器</h1>
- <div class="sub">按按钮或空格键，随机生成颜色</div>
- <div class="preview" id="preview"></div>
- <div class="hex" id="hex" title="点击复制">#3FA9F5</div>
- <div class="hint">点击色值可复制 · 按 空格键 也可以换色</div>
- <div class="row">
-  <button class="btn btn-main" id="gen">🎲 生成颜色</button>
-  <button class="btn btn-copy" id="copy">复制色值</button>
+<div class="top">
+ <div class="top-in">
+  <div class="logo">58同城</div>
+  <div class="city" onclick="switchCity()">📍 成都 ▾</div>
+  <div class="search"><input id="kw" placeholder="搜索招聘 / 租房 / 二手 / 家政…" onkeydown="if(event.key==='Enter')doSearch()"><button onclick="doSearch()">搜索</button></div>
+  <div class="top-link" onclick="openPub()">免费发布</div>
+  <div class="top-link" onclick="toastMsg('登录功能开发中')">登录 / 注册</div>
  </div>
- <div class="meta">
-  <div>RGB<b id="rgb">63, 169, 245</b></div>
-  <div>HSL<b id="hsl">204°, 90%, 60%</b></div>
-  <div>名称<b id="cname">—</b></div>
- </div>
- <div class="hist" id="hist"></div>
 </div>
 
+<div class="container">
+ <div class="hero">
+  <div class="em">🏘️</div>
+  <h1 id="heroTitle">成都本地生活信息门户</h1>
+  <p>招聘 · 租房 · 二手车 · 二手闲置 · 家政 · 本地商家 — 一站搞定</p>
+  <div class="hero-tags">
+   <span onclick="goTab('招聘')">急招岗位</span>
+   <span onclick="goTab('租房')">整租好房</span>
+   <span onclick="goTab('二手')">二手捡漏</span>
+   <span onclick="goTab('家政')">上门家政</span>
+   <span onclick="openPub()">免费发布</span>
+  </div>
+ </div>
+
+ <div class="sec-title">分类导航<span class="more" onclick="toastMsg('全部分类加载中…')">全部分类 ›</span></div>
+ <div class="grid-cats" id="cats"></div>
+
+ <div class="sec-title">为你推荐</div>
+ <div class="grid-panels">
+  <div class="panel">
+   <h3>💼 招聘求职 <span class="badge">日更新</span></h3>
+   <div class="rec-list" id="pJobs"></div>
+  </div>
+  <div class="panel">
+   <h3>🏠 房屋租售 <span class="badge">近地铁</span></h3>
+   <div class="rec-list" id="pHouse"></div>
+  </div>
+  <div class="panel">
+   <h3>📦 二手闲置 <span class="badge">个人车</span></h3>
+   <div class="rec-list" id="pUsed"></div>
+  </div>
+  <div class="panel">
+   <h3>🔧 家政维修 <span class="badge">上门</span></h3>
+   <div class="rec-list" id="pHome"></div>
+  </div>
+ </div>
+
+ <div class="sec-title">热门频道</div>
+ <div class="hot-grid" id="hots"></div>
+
+ <div class="publish-cta">
+  <div class="tx"><h3>有信息要发布？免费发布</h3><p>招聘 / 房源 / 二手 / 服务，30 秒发布，触达本地用户</p></div>
+  <button class="btn" onclick="openPub()">＋ 立即发布</button>
+ </div>
+</div>
+
+<div class="footer">
+ <b>58同城 · 本地生活信息分类门户</b><br>
+ 招聘求职 · 房屋租售 · 车辆买卖 · 二手闲置 · 家政服务 · 本地商家 · 教育培训 · 宠物 · 婚庆 · 餐饮<br>
+ 城市：成都 重庆 西安 昆明 贵阳 绵阳 · 信息真实性请自行核实 · 本页为演示样例
+</div>
+
+<div class="mask" id="pubMask">
+ <div class="modal">
+  <h3>免费发布信息</h3>
+  <label>信息分类</label>
+  <select id="pCat"><option>招聘</option><option>租房</option><option>二手</option><option>家政</option><option>商家</option></select>
+  <label>标题</label>
+  <input id="pTitle" placeholder="一句话说明你要发布的内容">
+  <label>价格（元）</label>
+  <input id="pPrice" type="number" placeholder="如 3200">
+  <label>描述</label>
+  <textarea id="pDesc" rows="3" placeholder="详细描述…"></textarea>
+  <div class="btns"><button class="b2" onclick="hide('pubMask')">取消</button><button class="b1" onclick="doPub()">发布</button></div>
+ </div>
+</div>
+
+<div class="tabbar">
+ <div class="tb on" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="i">🏠</span>首页</div>
+ <div class="tb" onclick="doSearch()"><span class="i">🔍</span>搜索</div>
+ <div class="tb" onclick="openPub()"><span class="i">➕</span>发布</div>
+ <div class="tb" onclick="toastMsg('消息开发中')"><span class="i">💬</span>消息</div>
+ <div class="tb" onclick="toastMsg('我的开发中')"><span class="i">👤</span>我的</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-const NAMED=[
- [255,0,0,'红色'],[0,255,0,'绿色'],[0,0,255,'蓝色'],[255,255,0,'黄色'],
- [255,0,255,'品红'],[0,255,255,'青色'],[255,165,0,'橙色'],[128,0,128,'紫色'],
- [0,128,0,'深绿'],[255,192,203,'粉红'],[139,69,19,'棕色'],[128,128,128,'灰色']
+const CATS=[
+ {n:'招聘',i:'💼',s:'高薪急招'},{n:'租房',i:'🏠',s:'整租合租'},{n:'二手车',i:'🚗',s:'个人车源'},{n:'二手',i:'📦',s:'闲置转让'},
+ {n:'家政',i:'🔧',s:'上门服务'},{n:'商家',i:'🏪',s:'本地好店'},{n:'宠物',i:'🐶',s:'猫狗宠物'},{n:'教育',i:'📚',s:'培训课程'},
+ {n:'建材',i:'🛋️',s:'家居装修'},{n:'婚庆',i:'💍',s:'摄影婚庆'},{n:'餐饮',i:'🍜',s:'美食外卖'},{n:'交友',i:'💑',s:'活动交友'},
+ {n:'商务',i:'📊',s:'公司服务'},{n:'生活',i:'🧺',s:'便民生活'},{n:'农机',i:'🚜',s:'农物工具'},{n:'更多',i:'⋯',s:'全部频道'}
 ];
-let cur='#3FA9F5', hist=[];
-function rand255(){return Math.floor(Math.random()*256)}
-function toHex(r,g,b){return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase()}
-function hex2rgb(h){const n=parseInt(h.slice(1),16);return[n>>16&255,n>>8&255,n&255]}
-function rgb2hsl(r,g,b){
- r/=255;g/=255;b/=255;
- const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
- let h=0,s=0,l=(mx+mn)/2;
- if(mx!==mn){
-  const d=mx-mn;
-  s=l>0.5?d/(2-mx-mn):d/(mx+mn);
-  if(mx===r)h=(g-b)/d+(g<b?6:0);
-  else if(mx===g)h=(b-r)/d+2;
-  else h=(r-g)/d+4;
-  h*=60;
- }
- return[Math.round(h),Math.round(s*100),Math.round(l*100)];
+const P={
+ jobs:[
+  {ic:'💼',g:'#e6f0ff',t:'诚聘前台文员 双休五险一金',d:'青羊区 · 大专可 · 应届可',p:'5.5K'},
+  {ic:'🚕',g:'#fff0e6',t:'招网约车司机 保底8000',d:'全市 · 时间自由 · 公司配车',p:'8K+'},
+  {ic:'🔧',g:'#e6ffed',t:'招聘水电维修技师 长白班',d:'高新区 · 五险 · 包吃住',p:'7K'},
+  {ic:'🏪',g:'#f5e6ff',t:'店员/营业员 接受新手',d:'锦江区 · 轮班 · 女生优先',p:'4.5K'}
+ ],
+ house:[
+  {ic:'🏠',g:'#e6f3ff',t:'武侯套二整租 近地铁1号线',d:'精装 · 家电齐 · 随时看房',p:'2800',u:'/月'},
+  {ic:'🏡',g:'#fff5e6',t:'天府新区套一 整装拎包住',d:'近学校 · 押一付一 · 可短租',p:'1900',u:'/月'},
+  {ic:'🏢',g:'#eef0ff',t:'高新区合租单间 独卫',d:'女生优先 · 拎包 · 包物业',p:'1100',u:'/月'},
+  {ic:'🏬',g:'#ffeef0',t:'临街商铺 50平 转让',d:'商圈 · 可餐饮 · 免转让费',p:'6800',u:'/月'}
+ ],
+ used:[
+  {ic:'📱',g:'#fff0e6',t:'iPhone 14 Pro 256G 95新',d:'电池92% · 面交 · 无拆修',p:'4299'},
+  {ic:'🚗',g:'#e6f0ff',t:'丰田卡罗拉 2020 一手车',d:'4.8万km · 无事故',p:'8.68万'},
+  {ic:'🪑',g:'#e6ffed',t:'实木餐桌椅 九成新',d:'搬家急出 · 自提优先',p:'460'},
+  {ic:'💻',g:'#f5e6ff',t:'MacBook Air M1 8+256',d:'轻薄本 · 成色好',p:'3600'}
+ ],
+ home:[
+  {ic:'🧹',g:'#e6ffed',t:'日常/开荒保洁 40元/时',d:'持证 · 擅长油烟机',p:'40',u:'/时'},
+  {ic:'❄️',g:'#e6f3ff',t:'空调加氟清洗 当天上门',d:'先报价 · 保修',p:'120',u:'起'},
+  {ic:'🚿',g:'#fff5e6',t:'疏通下水道 管道维修',d:'30分钟上门 · 不通不收费',p:'80',u:'起'},
+  {ic:'🔑',g:'#f5e6ff',t:'开锁换锁芯 24小时',d:'备案锁匠 · 15分钟到',p:'100',u:'起'}
+ ]
+};
+const HOTS=[
+ {i:'🔥',n:'急招岗位',s:'1.2万在招'},{i:'🏠',n:'整租好房',s:'8600套'},
+ {i:'🚗',n:'个人车源',s:'3200辆'},{i:'📦',n:'二手捡漏',s:'日均5000件'},
+ {i:'🔧',n:'上门家政',s:'师傅直连'},{i:'🏪',n:'本地好店',s:'周边优惠'},
+ {i:'🐶',n:'宠物领养',s:'健康保障'},{i:'📚',n:'培训课程',s:'就业推荐'}
+];
+function fillP(id,arr){
+ document.getElementById(id).innerHTML=arr.map(x=>`
+  <div class="rec" onclick="toastMsg('详情：${x.t}')">
+   <div class="ic" style="background:${x.g}">${x.ic}</div>
+   <div class="tx"><div class="t">${x.t}</div><div class="d">${x.d}</div></div>
+   <div class="p">¥${x.p}<small>${x.u||''}</small></div>
+  </div>`).join('');
 }
-function matchName(r,g,b){
- let best='—',bd=1e9;
- NAMED.forEach(([nr,ng,nb,n])=>{
-  const d=(r-nr)**2+(g-ng)**2+(b-nb)**2;
-  if(d<bd){bd=d;best=n}
- });
- return bd<6000?best:'—';
+function render(){
+ document.getElementById('cats').innerHTML=CATS.map(c=>
+  `<div class="cat" onclick="goTab('${c.n}')"><div class="ic">${c.i}</div><div class="nm">${c.n}</div><div class="sub">${c.s}</div></div>`).join('');
+ fillP('pJobs',P.jobs);fillP('pHouse',P.house);fillP('pUsed',P.used);fillP('pHome',P.home);
+ document.getElementById('hots').innerHTML=HOTS.map(h=>
+  `<div class="hot" onclick="toastMsg('进入频道：${h.n}')"><div class="i">${h.i}</div><div class="n">${h.n}</div><div class="s">${h.s}</div></div>`).join('');
 }
-function apply(hex){
- const [r,g,b]=hex2rgb(hex);
- cur=hex;
- document.body.style.background=hex;
- document.getElementById('preview').style.background=hex;
- document.getElementById('hex').textContent=hex;
- document.getElementById('rgb').textContent=r+', '+g+', '+b;
- const [h,s,l]=rgb2hsl(r,g,b);
- document.getElementById('hsl').textContent=h+'°, '+s+'%, '+l+'%';
- document.getElementById('cname').textContent=matchName(r,g,b);
+function goTab(n){
+ const map={'招聘':'招聘求职','租房':'房屋租售','二手':'二手闲置','家政':'家政维修'};
+ toastMsg('进入「'+n+'」频道'+(map[n]?'':'（聚合推荐）'));
+ document.querySelector('.grid-panels').scrollIntoView({behavior:'smooth'});
 }
-function generate(){
- const hex=toHex(rand255(),rand255(),rand255());
- apply(hex);
- hist.unshift(hex);
- if(hist.length>8)hist.pop();
- renderHist();
+function doSearch(){
+ const k=document.getElementById('kw').value.trim();
+ toastMsg(k?'搜索：'+k+'（演示数据）':'输入关键词搜索');
 }
-function renderHist(){
- document.getElementById('hist').innerHTML=hist.map((h,i)=>
-  '<div class="dot" style="background:'+h+';opacity:'+(1-i*0.1)+'" onclick="apply(\''+h+'\')" title="'+h+'"></div>').join('');
+function openPub(){document.getElementById('pubMask').classList.add('show')}
+function doPub(){
+ const t=document.getElementById('pTitle').value.trim();
+ if(!t){toastMsg('请填写标题');return}
+ hide('pubMask');toastMsg('发布成功！已提交审核');
 }
-function copyHex(){
- const t=cur;
- const done=()=>showToast('已复制 '+t);
- if(navigator.clipboard&&navigator.clipboard.writeText){
-  navigator.clipboard.writeText(t).then(done);
- }else{
-  const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
-  ta.select();document.execCommand('copy');document.body.removeChild(ta);
-  done();
- }
+function switchCity(){
+ const cs=['成都','重庆','西安','昆明','贵阳','绵阳'];
+ const cur=document.querySelector('.city').textContent.replace('📍 ','').replace(' ▾','');
+ const c=cs[(cs.indexOf(cur)+1)%cs.length];
+ document.querySelector('.city').textContent='📍 '+c+' ▾';
+ document.getElementById('heroTitle').textContent=c+'本地生活信息门户';
+ toastMsg('已切换到 '+c);
 }
-function showToast(m){
- const t=document.getElementById('toast');t.textContent=m;t.style.display='block';
- clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',1500);
-}
-document.getElementById('gen').onclick=generate;
-document.getElementById('copy').onclick=copyHex;
-document.getElementById('hex').onclick=copyHex;
-document.addEventListener('keydown',e=>{
- if(e.code==='Space'){e.preventDefault();generate()}
- if(e.code==='KeyC'&&!e.ctrlKey&&!e.metaKey)copyHex();
-});
-generate();
+function hide(id){document.getElementById(id).classList.remove('show')}
+function toastMsg(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',1600)}
+render();
 </script>
 </body>
 </html>
