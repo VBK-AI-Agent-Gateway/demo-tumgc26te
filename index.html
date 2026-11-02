@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>销售数据看板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei",sans-serif;background:#0f1a2b;color:#e8eef5;padding:16px}
+h1{text-align:center;font-size:1.5rem;margin-bottom:14px;color:#4fc3f7}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;max-width:1200px;margin:0 auto 16px}
+.kpi{background:linear-gradient(135deg,#16283f,#1d3a5f);border-radius:10px;padding:14px;text-align:center}
+.kpi .v{font-size:1.5rem;font-weight:bold;color:#ffb74d}
+.kpi .l{font-size:.85rem;color:#90a4ae;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:1200px;margin:0 auto}
+.card{background:#16283f;border-radius:10px;padding:12px}
+.card h2{font-size:1rem;color:#81d4fa;margin-bottom:6px}
+.chart{width:100%;height:320px}
+.wide{grid-column:1/-1}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>📊 销售数据看板</h1>
+<div class="kpis" id="kpis"></div>
+<div class="grid">
+<div class="card"><h2>门店销售额排行榜</h2><div class="chart" id="c1"></div></div>
+<div class="card"><h2>品类销售占比</h2><div class="chart" id="c2"></div></div>
+<div class="card wide"><h2>月度销售趋势</h2><div class="chart" id="c3"></div></div>
+<div class="card"><h2>门店明细分页（第 1 页 / 前 12 条）</h2><div style="max-height:220px;overflow:auto"><table id="tbl" style="width:100%;font-size:.8rem;border-collapse:collapse"></table></div></div>
+</div>
+<script>
+const D={"storeSale":[{"store":"门店10","value":230826.57},{"store":"门店3","value":225754.06},{"store":"门店7","value":212579.89},{"store":"门店5","value":210350.92},{"store":"门店9","value":209911.98},{"store":"门店1","value":197469.2},{"store":"门店4","value":183256.16},{"store":"门店2","value":181594.68},{"store":"门店8","value":181982.4},{"store":"门店6","value":189138.12}],"category":{"家电":690249.74,"日化":659954.98,"食品":672759.26},"trend":{"1月":399049.98,"2月":436642.59,"3月":408845.47,"4月":269968.49,"5月":232238.15,"6月":276219.3},"kpi":{"total":2022963.98,"orders":20571,"stores":10},"note":"门店销售额明细数据来自 门店明细.csv，示例列：日期/门店/营业额/客流","detail":[{"日期":"2026-07-06","门店":"门店1","营业额":16347.52,"客流":276},{"日期":"2026-07-09","门店":"门店12","营业额":7580.99,"客流":800},{"日期":"2026-07-13","门店":"门店2","营业额":42419.13,"客流":521},{"日期":"2026-07-17","门店":"门店3","营业额":67581.93,"客流":690},{"日期":"2026-07-21","门店":"门店4","营业额":70387.89,"客流":376},{"日期":"2026-07-25","门店":"门店5","营业额":41630.23,"客流":432},{"日期":"2026-07-29","门店":"门店6","营业额":83066.6,"客流":907},{"日期":"2026-08-02","门店":"门店7","营业额":16781.94,"客流":631},{"日期":"2026-08-06","门店":"门店8","营业额":11879.13,"客流":791},{"日期":"2026-08-10","门店":"门店9","营业额":76828.79,"客流":552},{"日期":"2026-08-14","门店":"门店10","营业额":60063.83,"客流":804},{"日期":"2026-08-18","门店":"门店1","营业额":47673.95,"客流":688}]};
+document.getElementById('kpis').innerHTML=
+`<div class="kpi"><div class="v">￥${(D.kpi.total/10000).toFixed(1)}万</div><div class="l">总销售额</div></div>
+<div class="kpi"><div class="v">${D.kpi.orders.toLocaleString()}</div><div class="l">总订单数</div></div>
+<div class="kpi"><div class="v">${D.kpi.stores}</div><div class="l">门店数</div></div>`;
+const st=echarts.init(document.getElementById('c1'));
+st.setOption({tooltip:{},grid:{left:110},xAxis:{type:'value'},yAxis:{type:'category',data:D.storeSale.map(d=>d.store).reverse()},
+series:[{type:'bar',data:D.storeSale.map(d=>d.value).reverse(),itemStyle:{color:'#4fc3f7'},label:{show:true,position:'right',formatter:v=>(v.value/10000).toFixed(1)+'万'}}]});
+const ct=echarts.init(document.getElementById('c2'));
+ct.setOption({legend:{bottom:0,textStyle:{color:'#90a4ae'}},
+tooltip:{formatter:p=>p.name+': '+(p.percent).toFixed(1)+'%'},
+series:[{type:'pie',radius:['40%','65%'],data:Object.entries(D.category).map(([k,v])=>({name:k,value:v})),label:{color:'#e8eef5',formatter:'{b}\n{d}%'}}]});
+const mt=echarts.init(document.getElementById('c3'));
+mt.setOption({tooltip:{trigger:'axis'},grid:{left:60},
+xAxis:{type:'category',data:Object.keys(D.trend)},yAxis:{type:'value',name:'销售额'},
+series:[{type:'line',smooth:true,data:Object.values(D.trend),areaStyle:{opacity:.3},itemStyle:{color:'#ffb74d'},lineStyle:{width:3}}]});
+const rows=D.detail;
+document.getElementById('tbl').innerHTML='<tr>'+Object.keys(rows[0]).map(k=>`<th style="padding:4px;color:#81d4fa;border-bottom:1px solid #24405e">${k}</th>`).join('')+'</tr>'+
+rows.map(r=>'<tr>'+Object.keys(rows[0]).map(k=>`<td style="padding:4px;border-bottom:1px solid #1d3247">${r[k]}</td>`).join('')+'</tr>').join('');
+window.addEventListener('resize',()=>[st,ct,mt].forEach(c=>c.resize()));
+</script>
+</body>
+</html>
