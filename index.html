@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>荣威 RX5 智能座舱 · iVIS</title>
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/modules.css">
+</head>
+<body>
+<div id="app">
+  <!-- 语音层 -->
+  <div class="voice-layer" id="voiceLayer">
+    <div class="voice-ball" id="voiceBall"><span></span><span></span><span></span><span></span></div>
+    <div class="voice-text" id="voiceText">聆听中…</div>
+    <div class="voice-tip">试试：「打开空调」「导航去公司」「播放音乐」· 可见即可说</div>
+  </div>
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <div class="statusbar">
+    <div class="sb-left"><span>📶 4G</span><span>🔵 蓝牙 Pixel 7a</span></div>
+    <div class="sb-mid" id="clock">--:--</div>
+    <div class="sb-right"><span>🌐 WiFi</span><span id="acTempMini">🌡 23°C</span><span onclick="toggleTheme()" id="themeBtn">🌙</span></div>
+  </div>
+
+  <div class="gearticks" id="gearBar">
+    <span data-g="P" class="on">P</span><span data-g="R">R</span><span data-g="N">N</span><span data-g="D">D</span>
+    <span class="spd"><b id="spd">0</b><small> km/h</small></span>
+  </div>
+
+  <main class="stage">
+    <!-- HOME -->
+    <section class="page home" data-p="home" style="display:grid">
+      <div class="card car3d">
+        <h3><b>荣威 RX5</b> · 旗舰智驾版</h3>
+        <div class="stage3d"><div class="body3d"><span class="lights"></span><div class="wheel l"></div><div class="wheel r"></div></div></div>
+        <div class="hud">
+          <div class="g spd"><div class="v" id="hudSpeed">0<small>km/h</small></div><div class="l">车速</div></div>
+          <div class="g ev"><div class="v">76<small>%</small></div><div class="l">电量</div></div>
+          <div class="g fuel"><div class="v">61<small>%</small></div><div class="l">油量</div></div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="card navcard" id="navCard" onclick="go('nav')">
+          <div class="mini-map"><div class="route"></div></div>
+          <div class="addr">🧭 导航 · 去哪里</div>
+          <div class="meta">点快捷卡开始规划</div>
+          <div class="hint" id="navHint" style="display:none">D 挡 · 导航优先展示</div>
+        </div>
+      </div>
+      <div class="card musiccard" onclick="go('media')">
+        <div class="cover">🎵</div>
+        <div class="mi"><div class="tt" id="mtt">起航</div><div class="ar" id="mar">_generator · 电子</div><div class="bar"><i id="mprog" style="width:15%"></i></div></div>
+        <div class="eq" id="mstate">▶️</div>
+      </div>
+      <div class="card apps">
+        <div class="app" onclick="go('ac')"><i>❄️</i><br><span>空调</span></div>
+        <div class="app" onclick="go('vehicle')"><i>🚗</i><br><span>车辆</span></div>
+        <div class="app" onclick="go('avm')"><i>🎥</i><br><span>360</span></div>
+        <div class="app" onclick="go('voicePage')"><i>🎙️</i><br><span>语音</span></div>
+        <div class="app" onclick="go('settings')"><i>⚙️</i><br><span>设置</span></div>
+        <div class="app" onclick="go('media')"><i>📞</i><br><span>电话</span></div>
+      </div>
+    </section>
+
+    <!-- NAV -->
+    <section class="page" data-p="nav" style="display:none;padding:0">
+     <div class="navmap">
+      <div class="roads">
+        <div class="ro major" style="top:20%;left:0;width:100%;height:16px"></div>
+        <div class="ro major" style="top:56%;left:0;width:100%;height:20px"></div>
+        <div class="ro major" style="top:80%;left:0;width:100%;height:14px"></div>
+        <div class="ro" style="left:20%;top:0;width:14px;height:100%"></div>
+        <div class="ro" style="left:48%;top:0;width:18px;height:100%"></div>
+        <div class="ro" style="left:78%;top:0;width:12px;height:100%"></div>
+        <div class="ro" style="top:36%;left:30%;width:26%;height:10px;transform:rotate(8deg)"></div>
+        <div class="ro" style="top:66%;left:60%;width:30%;height:10px;transform:rotate(-12deg)"></div>
+      </div>
+      <div class="car" style="left:48%;top:52%"></div>
+      <div class="navbanner" id="navBanner" style="display:none">前方 500 米右转 · 3.4km · 12 分钟</div>
+      <div class="navhead"><div class="navsearch">🔍<input id="kw" placeholder="搜索目的地 / 充电站 / 加油站"><span class="mic" onclick="T('语音搜索：请说出目的地')">🎙️</span></div></div>
+      <div class="nav-tips">
+        <div class="nav-tip" onclick="setDest('公司 · 陆家嘴软件园')"><span class="acc">3.4km</span><b>公司 · 陆家嘴软件园</b><br>12 min</div>
+        <div class="nav-tip" onclick="setDest('充电站 · 特来电')"><span class="acc">1.8km</span><b>充电站 · 特来电</b><br>快充 ×6</div>
+        <div class="nav-tip" onclick="setDest('加油站 · 中石化')"><span class="acc">4.6km</span><b>加油站 · 中石化</b><br>92#/95#</div>
+      </div>
+      <div class="lane" id="laneBar" style="display:none"><span class="straight on"></span><span class="left"></span><span class="right"></span><span class="straight"></span></div>
+     </div>
+    </section>
+
+    <!-- AC -->
+    <section class="page" data-p="ac" style="display:none">
+      <div class="page-title">❄️ 空调控制</div>
+      <div class="ac-wrap">
+        <div class="ac-left">
+          <div class="tempdial">
+            <div class="dial" id="dial" style="--deg:50;--warm:#5aa4ff"><div class="t"><b id="tval">23</b><small>°C</small></div></div>
+            <div class="acbtns">
+              <div class="rbtn" onclick="temp(1)">＋</div><div class="rbtn" onclick="toggleAC()" id="acPwr">⏻</div><div class="rbtn" onclick="temp(-1)">－</div>
+            </div>
+          </div>
+          <div class="fanslider"><div class="lbl"><span>风量</span><b id="fanV">3 档</b></div><input type="range" min="0" max="7" value="3" id="fan" oninput="fan=document.getElementById('fan').value;document.getElementById('fanV').textContent=fan+' 档'"></div>
+        </div>
+        <div class="ac-right" style="flex:1;display:flex;flex-direction:column;gap:14px">
+          <div class="ac-toggles" style="grid-template-columns:repeat(2,1fr)">
+            <div class="atog on" onclick="tog(this,'内循环')"><i>🔄</i>内循环</div>
+            <div class="atog" onclick="tog(this,'外循环')"><i>🌐</i>外循环</div>
+            <div class="atog on" onclick="tog(this,'A/C 制冷')"><i>❄️</i>A/C</div>
+            <div class="atog" onclick="tog(this,'AUTO')"><i>🤖</i>AUTO</div>
+            <div class="atog" onclick="tog(this,'前除雾')"><i>🪟</i>前除雾</div>
+            <div class="atog" onclick="tog(this,'后除雾')"><i>🪞</i>后除雾</div>
+          </div>
+          <div class="card"><div style="font-weight:700;font-size:14px">🔥 座椅加热 <span id="shL" style="font-size:12px;color:var(--tx2);margin-left:auto">关闭</span></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <div class="rbtn" style="width:auto;padding:0 18px;font-size:12px" onclick="sh(0)">关</div>
+            <div class="rbtn" style="width:auto;padding:0 18px;font-size:12px" onclick="sh(1)">1档</div>
+            <div class="rbtn" style="width:auto;padding:0 18px;font-size:12px" onclick="sh(2)">2档</div>
+            <div class="rbtn" style="width:auto;padding:0 18px;font-size:12px" onclick="sh(3)">3档</div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEDIA -->
+    <section class="page" data-p="media" style="display:none">
+      <div class="page-title">🎵 多媒体</div>
+      <div id="dWarn" style="display:none" class="media-warning">🚸 行车中（D挡）已限制视频播放 · 音乐不受限，P 挡可解锁全部娱乐</div>
+      <div class="media-wrap">
+        <div class="media-list">
+          <div class="rolesw">
+            <div class="chip on" onclick="M.src='on';renderList()">🎧 在线音乐</div>
+            <div class="chip" onclick="M.src='local';renderList()">💾 本地音频</div>
+            <div class="chip" onclick="M.src='bt';renderList()">📞 蓝牙电话</div>
+          </div>
+          <div id="mlist"></div>
+        </div>
+        <div class="player">
+          <div class="bigcover">🎧</div>
+          <div style="text-align:center"><div id="pcT" style="font-size:17px;font-weight:700">未播放</div><div id="pcA" style="color:var(--tx2);font-size:12px;margin-top:2px">点选曲目开始</div>
+          <div style="display:flex;gap:14px;margin-top:12px;align-items:center;justify-content:center;font-size:22px">
+            <span style="cursor:pointer" onclick="prev()">⏮</span><span style="cursor:pointer;font-size:32px" id="pbtn" onclick="togglePlay()">▶️</span><span style="cursor:pointer" onclick="next()">⏭</span></div></div>
+          <div class="volcard"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--tx2);margin-bottom:8px"><span>🔊 音量</span><b style="color:var(--tx)" id="volV">60%</b></div>
+          <input type="range" min="0" max="100" value="60" id="vol" oninput="document.getElementById('volV').textContent=this.value+'%'"></div>
+          <button style="width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--tx);cursor:pointer" onclick="T('已切到蓝牙电话 · 音乐暂停')">📵 转蓝牙电话不离开音乐</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VEHICLE -->
+    <section class="page" data-p="vehicle" style="display:none">
+      <div class="page-title">🚙 车辆设置</div>
+      <div class="scroll">
+        <div class="v-grid">
+          <div class="v-cell on" id="vLight" onclick="tog2(this,'近光已开启','灯已关闭')"><i>💡</i><b>车灯</b><span>已开启（近光）</span></div>
+          <div class="v-cell on" id="vLock" onclick="tog2(this,'全车已闭锁','已解锁')"><i>🔒</i><b>门锁</b><span>已锁</span></div>
+          <div class="v-cell on" id="vMir" onclick="tog2(this,'后视镜已展开','后视镜已折叠')"><i>🪞</i><b>后视镜</b><span>已展开</span></div>
+          <div class="v-cell" id="vRoof" onclick="tog2(this,'天窗已开启','天窗已关闭')"><i>🌅</i><b>天窗</b><span>已关闭</span></div>
+          <div class="v-cell on" onclick="setMode('舒适',this)"><i>🛋️</i><b>舒适</b><span>均衡</span></div>
+          <div class="v-cell" onclick="setMode('运动',this)"><i>🚀</i><b>运动</b><span>提速</span></div>
+          <div class="v-cell" onclick="setMode('节能',this)"><i>🌱</i><b>节能</b><span>低耗</span></div>
+          <div class="v-cell" onclick="setMode('雪地',this)"><i>❄️</i><b>雪地</b><span>防滑</span></div>
+          <div class="v-cell" onclick="setMode('越野',this)"><i>⛰️</i><b>越野</b><span>四驱</span></div>
+        </div>
+        <div class="v-hint">🛡️ 驾驶模式影响动力响应/动能回收/转向手感，行车中禁止切换至洗车模式。</div>
+        <div class="reverse"><span style="font-size:22px">🚙 后备视角</span>
+          <div style="font-size:13px;color:var(--tx2)" id="revT">切到 R 挡激活（或点下方按钮）</div>
+          <div class="grid3"></div><div class="lines"></div></div>
+        <div style="display:flex;gap:10px">
+          <div class="rbtn" style="flex:1;padding:12px;display:flex;align-items:center;justify-content:center" onclick="document.querySelector('[data-p=vehicle] .reverse').style.borderColor='#2f6df6';T('倒车影像已打开模拟')">▶ 打开倒车影像</div>
+          <div class="rbtn" style="flex:1;padding:12px;display:flex;align-items:center;justify-content:center" onclick="T('已关闭');">■ 关闭</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VOICE -->
+    <section class="page voicepage" data-p="voicePage" style="display:none">
+      <div class="big" onclick="T('聆听中…')"><i style="font-style:normal">🎙️</i><span>点我 or 说「你好荣威」</span></div>
+      <div style="color:var(--tx2);font-size:14px">支持连续对话 · 30秒免唤醒 · 可见即可说</div>
+      <div class="cmdlist">
+        <div class="cmdb" onclick="go('ac');T('空调已打开')">打开空调</div>
+        <div class="cmdb" onclick="T('空调已关闭')">关闭空调</div>
+        <div class="cmdb" onclick="go('nav');setDest('公司 · 陆家嘴软件园')">导航去公司</div>
+        <div class="cmdb" onclick="go('media');togglePlay(1)">播放音乐</div>
+        <div class="cmdb" onclick="go('vehicle')">打开天窗</div>
+        <div class="cmdb" onclick="go('avm')">打开360全景</div>
+        <div class="cmdb" onclick="go('ac');document.getElementById('tval').textContent=23;T('温度已调至 23°C')">调到二十三度</div>
+        <div class="cmdb" onclick="go('ac');sh(2)">打开座椅加热</div>
+        <div class="cmdb" onclick="go('vehicle');T('已切换 节能 模式')">切换节能模式</div>
+      </div>
+      <div style="color:var(--tx2);font-size:12px;margin-top:auto">唤醒词：你好斑马 / 你好荣威 ｜ 退出：闭嘴/取消</div>
+    </section>
+
+    <!-- AVM -->
+    <section class="page" data-p="avm" style="display:none">
+      <div class="page-title">🎥 环视 · 泊车辅助</div>
+      <div class="avm-wrap">
+        <div class="avm-main"><span class="lab" id="avmL">360° 全景 · 合成俯视</span>
+          <div style="font-size:60px">🚙</div><div class="avm-radial"></div>
+        </div>
+        <div class="avm-side">
+          <div class="box on" onclick="setView('car',this)"><i>🚙</i>俯视合成</div>
+          <div class="box" onclick="setView('front',this)"><i>⬆️</i>前视</div>
+          <div class="box" onclick="setView('rear',this)"><i>⬇️</i>后视·倒车</div>
+          <div class="box" id="parkBtn" onclick="park=!park;this.classList.toggle('on',park);T(park?'泊车辅助开启':'已关闭')"><i>🅿️</i>泊车辅助 OFF</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page" data-p="settings" style="display:none">
+      <div class="page-title">⚙️ 系统设置</div>
+      <div class="scroll">
+        <div class="set-grid">
+          <div class="set-item" onclick="bri()"><i>💡</i><div><div class="t">屏幕亮度</div><div class="s" id="briV">80%</div></div></div>
+          <div class="set-item" onclick="toggleTheme()"><i id="themeBtn2">🌙</i><div><div class="t">座舱主题</div><div class="s" id="themeS">深色（行车优先）</div></div></div>
+          <div class="set-item on" onclick="this.classList.toggle('on');T('WiFi '+(this.classList.contains('on')?'已连接 RONGWEI-5G':'已断开'))"><i>🌐</i><div><div class="t">WiFi</div><div class="s">RONGWEI-5G</div></div><span class="sw"></span></div>
+          <div class="set-item on" onclick="this.classList.toggle('on');T('蓝牙 '+(this.classList.contains('on')?'已连接 Pixel 7a':'已断开'))"><i>🔵</i><div><div class="t">蓝牙</div><div class="s">Pixel 7a</div></div><span class="sw"></span></div>
+        </div>
+        <div class="ota"><b>🔄 OTA 升级</b> · 5.0.1 <div style="margin-top:8px;font-size:13px;color:var(--tx2)">新一代斑马智行 5.0 · 新增充电规划、AI助手、行车记录。</div>
+        <button style="margin-top:10px;padding:9px 18px;border-radius:12px;border:none;background:var(--pri);color:#fff;font-size:13px;cursor:pointer" onclick="ota(this)">检查更新</button></div>
+        <div class="card" style="padding:16px">
+          <div style="font-weight:700;font-size:15px;margin-bottom:8px">ℹ️ 关于本机</div>
+          <div style="font-size:13px;color:var(--tx2);line-height:1.9">
+           车型：荣威 RX5 · 旗舰智驾版　｜　车机系统：荣威 iVIS 2.0（网页模拟）<br>
+           中控屏：10.4" 竖屏 1080×1920<br>
+           免责：本页为纯前端交互演示，非官方固件，无真实车控。</div>
+        </div>
+        <div class="about">© 2025 RX5 iVIS · 行车中请优先语音交互</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="dock">
+    <button class="on" data-go="home" onclick="go('home')"><i>🏠</i><span>主页</span></button>
+    <button data-go="nav" onclick="go('nav')"><i>🧭</i><span>导航</span></button>
+    <button data-go="ac" onclick="go('ac')"><i>❄️</i><span>空调</span></button>
+    <button data-go="media" onclick="go('media')"><i>🎵</i><span>多媒体</span></button>
+    <button data-go="vehicle" onclick="go('vehicle')"><i>🚗</i><span>车辆</span></button>
+    <button data-go="voicePage" onclick="go('voicePage')"><i>🎙️</i><span>语音</span></button>
+    <button data-go="avm" onclick="go('avm')"><i>🎥</i><span>影像</span></button>
+    <button data-go="settings" onclick="go('settings')"><i>⚙️</i><span>设置</span></button>
+  </div>
+</div>
+
+<script>
+/* ---------- 原生JS 实现（无任何外部依赖，零CDN） ---------- */
+var PLAYING=false,PROG=15,MU=[
+ {t:'起航',ar:'_generator · 电子',len:222},{t:'海浪之城',ar:'Zhou Tian · 流行',len:196},
+ {t:'川流不息',ar:'HUA · 国潮电子',len:251},{t:'机电时代',ar:'Liu Hai · Synth',len:189},
+ {t:'白日梦蓝',ar:'Chen Yi · 摇滚',len:234},{t:'远山',ar:'Miao · 民谣',len:263}];
+var CUR=0,GEAR='P',SRC='on',PARK=false;
+function $(id){return document.getElementById(id)}
+function T(m){var t=$('toast');t.textContent=m;t.style.opacity=1;t.style.transform='translate(-50%,0)';clearTimeout(t._t);t._t=setTimeout(()=>{t.style.opacity=0;t.style.transform='translate(-50%,-14px)'},1800)}
+function go(p){
+  document.querySelectorAll('[data-p]').forEach(el=>el.style.display=el.dataset.p===p?(el.dataset.p==='home'?'grid':'flex'):'none');
+  document.querySelectorAll('.dock button').forEach(b=>b.classList.toggle('on',b.dataset.go===p));
+  document.querySelector('.stage').classList.add('pageanim');setTimeout(()=>document.querySelector('.stage').classList.remove('pageanim'),340);
+  T(p==='home'?'回到主页':''||({nav:'导航',ac:'空调',media:'多媒体',vehicle:'车辆设置',voicePage:'语音助手',avm:'环视影像',settings:'设置'}[p]||''));
+  if(p==='media')renderList();
+}
+document.querySelectorAll('.navmap, .navsearch input').forEach(e=>e.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();setDest(document.getElementById('kw').value||'自定义目的地')}}));
+function setDest(n){
+  $('navBanner').style.display='block';$('laneBar').style.display='flex';
+  $('navBanner').textContent='前方 500 米右转 · 3.4km · 12 分钟 → '+n;
+  document.querySelector('[data-p=home] .navcard .addr').textContent='🧭 '+n;
+  document.querySelector('[data-p=home] .navcard .meta').textContent='12 分钟 · 3.4 km';
+}
+function temp(d){var v=Math.max(16,Math.min(30,(+$('tval').textContent)+d));$('tval').textContent=v;
+  var deg=(v-16)/14*100;$('dial').style.setProperty('--deg',deg);$('dial').style.setProperty('--warm',v>22?'#ff8a4d':'#5aa4ff');
+  $('acTempMini').textContent='🌡 '+v+'°C';T(v+'°C')}
+function toggleAC(){T('空调电源切换')}
+function tog(el,label){el.classList.toggle('on');T(label+(el.classList.contains('on')?'已开启':'已关闭'))}
+function tog2(el,on,off){el.classList.toggle('on');var onn=el.classList.contains('on');T(onn?on:off);
+  el.querySelector('span').textContent=onn?(on.includes('锁')?'已锁':on.includes('天窗')?'已开启':on.includes('镜')?'已展开':'已开启（近光）'):(off.includes('锁')?'已解锁':off.includes('天窗')?'已关闭':off.includes('镜')?'已折叠':'已关闭')}
+function sh(v){$('shL').textContent=v>0?v+' 档':'关闭';T('座椅加热 '+v+' 档')}
+function setMode(k,el){document.querySelectorAll('.v-cell').forEach(x=>{if(['舒适','运动','节能','雪地','越野'].includes(x.querySelector('b').textContent))x.classList.remove('on')});el.classList.add('on');T('已切换 · '+k)}
+function togglePlay(force){
+  PLAYING=typeof force==='number'?true:!PLAYING;$('pbtn').textContent=PLAYING?'⏸':'▶️';
+  $('mstate').textContent=PLAYING?'🔊':'▶️';if(PLAYING){$('pcT').textContent=MU[CUR].t;$('pcA').textContent=MU[CUR].ar;
+    $('mtt').textContent=MU[CUR].t;$('mar').textContent=MU[CUR].ar;T('播放 '+MU[CUR].t)}
+}
+function pick(i){CUR=i;togglePlay.call(null);togglePlay();/* 先设位置再播放 */}
+function prev(){CUR=(CUR+MU.length-1)%MU.length;if(PLAYING){$('pcT').textContent=MU[CUR].t;$('pcA').textContent=MU[CUR].ar}else{CUR(CUR)}
+  $('mtt').textContent=MU[CUR].t;$('mar').textContent=MU[CUR].ar}
+function next(){CUR=(CUR+1)%MU.length;$('mtt').textContent=MU[CUR].t;$('mar').textContent=MU[CUR].ar;if(PLAYING){$('pcT').textContent=MU[CUR].t;$('pcA').textContent=MU[CUR].ar}}
+function renderList(){
+  var box=$('mlist');box.innerHTML='';
+  if(SRC==='bt'){
+    [['🆘','道路救援 400-920-2020','荣威专属'],['📞','最近 · 张三','昨天 14:02'],['📞','最近 · 李四','周一 09:18']].forEach(r=>{
+      box.insertAdjacentHTML('beforeend','<div class="ml-item" onclick="T(\'拨打中…\')"><div class="co">'+r[0]+'</div><div><div class="ti">'+r[1]+'</div><div class="ar">'+r[2]+'</div></div></div>')});
+    return;
+  }
+  MU.forEach((m,i)=>{box.insertAdjacentHTML('beforeend','<div class="ml-item" data-i="'+i+'"><div class="co">'+(SRC==='on'?'🎧':'💾')+'</div><div><div class="ti">'+m.t+'</div><div class="ar">'+m.ar+'</div></div><div class="ln">'+Math.floor(m.len/60)+':'+String(m.len%60).padStart(2,'0')+'</div></div>')});
+  box.querySelectorAll('.ml-item').forEach(el=>el.addEventListener('click',()=>{CUR=+el.dataset.i;togglePlay();togglePlay('on')}))
+}
+function setView(v,el){document.querySelectorAll('.avm-side .box').forEach(x=>x.classList.remove('on'));el.classList.add('on');
+  $('avmL').textContent={car:'360°全景·合成俯视',front:'前视摄像头',rear:'后视·倒车影像'}[v];T('视角已切换 · '+el.textContent.trim().slice(2))}
+function bri(){var cur=(+$('briV').textContent.replace('%',''));var s=[40,60,80,100].find(x=>x>cur)||40;$('briV').textContent=s+'%';document.body.style.filter='brightness('+(0.6+s/100*0.5)+')'}
+function toggleTheme(){
+  var html=document.documentElement;var cur=html.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';
+  html.setAttribute('data-theme',nx);
+  $('themeBtn').textContent=nx==='dark'?'🌙':'☀️';
+  var b=$('themeBtn2');if(b)b.textContent=nx==='dark'?'🌙':'☀️';
+  var ts=$('themeS');if(ts)ts.textContent=nx==='dark'?'深色（行车优先）':'浅色';
+  T('主题：'+(nx==='dark'?'深色':'浅色'))
+}
+function ota(btn){if(btn.textContent==='检查更新'){btn.textContent='已找到 5.0.2 · 下载中…';
+    setTimeout(()=>btn.textContent='✅ 已安装 5.0.2',1800)}}
+/* 初始化 */
+setInterval(()=>{var d=new Date();$('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')},1000);
+setInterval(()=>{if(PLAYING){PROG=(PROG+1)%100;$('mprog').style.width=PROG+'%'}},900);
+document.querySelectorAll('[data-g]').forEach(el=>el.addEventListener('click',()=>{
+  document.querySelectorAll('[data-g]').forEach(x=>x.classList.remove('on'));el.classList.add('on');
+  GEAR=el.dataset.g;
+  if(GEAR==='D'){GEAR_SPEED=40;$('spd').textContent=40;$('hudSpeed').innerHTML='40<small>km/h</small>';
+    $('navHint').style.display='block';$('dWarn').style.display='block';T('D挡 行车中 · 导航优先 · 娱乐受限')}
+  else if(GEAR==='R'){T('R 挡 · 倒车影像已启用，建议到「影像」查看');$('revT').textContent='倒车影像已激活 · 0-10 km/h'}
+  else if(GEAR==='P'){GEAR_SPEED=0;$('spd').textContent=0;$('hudSpeed').innerHTML='0<small>km/h</small>';
+    $('navHint').style.display='none';$('dWarn').style.display='none';T('P挡 驻车 · 娱乐解锁')}
+}));
+renderList();
+T('荣威RX5车机已就绪 · 试试底部各标签');
+</script>
+</body>
+</html>
