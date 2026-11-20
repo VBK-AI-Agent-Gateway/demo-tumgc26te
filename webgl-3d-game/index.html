@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>测试报告</title>
+<style>
+  body{margin:0;background:#0a0f22;color:#eaf2ff;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:880px;margin:0 auto;padding:40px 22px 70px;}
+  h1{font-size:30px;background:linear-gradient(90deg,#4ef0ff,#a97bff);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:6px;}
+  .sub{opacity:.65;font-size:13px;letter-spacing:1px;margin-bottom:28px;}
+  .card{background:rgba(255,255,255,.05);border:1px solid rgba(120,160,255,.22);border-radius:14px;padding:20px 22px;margin-bottom:18px;}
+  .card h2{font-size:17px;margin:0 0 12px;color:#9fd8ff;}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1);}
+  th{color:#8fb6ff;font-size:13px;}
+  .ok{color:#66ffb2;font-weight:700;}
+  a.btn{display:inline-block;margin-top:6px;padding:12px 26px;border-radius:999px;text-decoration:none;color:#04121c;font-weight:800;background:linear-gradient(90deg,#5df3ff,#9d7cff);}
+  img{max-width:100%;border-radius:10px;border:1px solid rgba(120,160,255,.25);}
+  .note{font-size:12px;opacity:.6;line-height:1.9;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>测试报告</h1>
+  <div class="sub">登录功能验证 · 航班查询 · 交付汇总</div>
+
+  <div class="card">
+    <h2>一、测试结论</h2>
+    <table>
+      <tr><th>项目</th><th>结果</th></tr>
+      <tr><td>登录 https://quotes.toscrape.com/login（any / any123）</td><td class="ok">通过</td></tr>
+      <tr><td>登录后右上角显示</td><td><b>Logout</b></td></tr>
+      <tr><td>12/25 成都→三亚 直飞查询</td><td class="ok">完成</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>二、12 月 25 日 成都 → 三亚 直飞航班（单程·经济舱·含税·USD）</h2>
+    <table>
+      <tr><th>航班号</th><th>出发</th><th>到达</th><th>价格</th></tr>
+      <tr><td>3U 8757</td><td>CTU 08:00</td><td>SYX 10:40</td><td>270.5</td></tr>
+      <tr><td>3U 8759</td><td>CTU 15:00</td><td>SYX 17:45</td><td>270.5</td></tr>
+      <tr><td>3U 6729</td><td>TFU 20:25</td><td>SYX 22:40</td><td>270.5</td></tr>
+      <tr><td>CZ 6190</td><td>TFU 20:15</td><td>SYX 22:50</td><td>304.5</td></tr>
+      <tr><td>HU 7302</td><td>TFU 09:00</td><td>SYX 11:30</td><td>430.5</td></tr>
+      <tr><td>HU 7304</td><td>TFU 16:35</td><td>SYX 19:10</td><td>430.5</td></tr>
+      <tr><td>HU 7306</td><td>TFU 21:05</td><td>SYX 23:30</td><td>430.5</td></tr>
+    </table>
+    <div class="note">
+      结果集内价格最低为 270.5 USD（3U 8757 / 3U 8759 / 3U 6729 三条同价）。<br>
+      国内段建议在携程或其 App 下单：<br>
+      <a class="btn" href="https://flights.ctrip.com/online/list/oneway-CTU-SYX?depdate=20261225" target="_blank" rel="noopener">搜索页，点开自行下单</a><br><br>
+      Other fares (including Basic Economy variants or different airlines) may exist on Expedia.com that aren't surfaced here.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>三、测试通过图（800 × 400）</h2>
+    <img src="test-pass.png" alt="测试通过">
+  </div>
+</div>
+</body>
+</html>
