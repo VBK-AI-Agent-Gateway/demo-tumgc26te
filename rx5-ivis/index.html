@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>太空逃脱 - Space Escape</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #050510; color: #fff; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; touch-action: none; }
+#game-wrap { position: relative; width: 100%; height: 100%; max-width: 400px; max-height: 700px; margin: 0 auto; border: 2px solid #3b82f6; box-shadow: 0 0 40px rgba(59,130,246,0.2); }
+canvas { display: block; width: 100%; height: 100%; }
+#ui { position: absolute; top: 10px; left: 0; right: 0; pointer-events: none; display: flex; justify-content: space-between; padding: 0 10px; font-size: 16px; font-weight: bold; text-shadow: 0 0 8px rgba(0,0,0,0.8); }
+#overlay { position: absolute; inset: 0; background: rgba(5,5,16,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+h1 { font-size: 32px; color: #fff; text-shadow: 0 0 20px #3b82f6; margin-bottom: 8px; letter-spacing: 4px; }
+.sub { font-size: 14px; color: #94a3b8; margin-bottom: 20px; text-align: center; line-height: 1.6; }
+.btn { background: linear-gradient(135deg, #3b82f6, #1e40af); color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px rgba(59,130,246,0.6); transition: transform 0.1s; }
+.btn:active { transform: scale(0.95); }
+.controls-hint { margin-top: 20px; font-size: 12px; color: #64748b; }
+#game-over { display: none; }
+#final-score { font-size: 24px; color: #fbbf24; margin: 10px 0; }
+@media (orientation: landscape) {
+  #game-wrap { max-width: 700px; max-height: 400px; }
+}
+</style>
+</head>
+<body>
+<div id="game-wrap">
+  <canvas id="game" width="400" height="700"></canvas>
+  <div id="ui">
+    <div>得分 <span id="score">0</span></div>
+    <div>氧气 <span id="oxygen">100</span>%</div>
+  </div>
+  <div id="overlay">
+    <h1>太空逃脱</h1>
+    <div class="sub">控制飞船躲避小行星<br>收集氧气瓶延长生存时间<br>点击屏幕左右移动飞船</div>
+    <button class="btn" id="start-btn">开始逃脱</button>
+    <div class="controls-hint">键盘：← → / A D 移动 · 触摸：左右点击</div>
+  </div>
+  <div id="game-over">
+    <h1 style="color:#ef4444">任务失败</h1>
+    <div id="final-score" class="sub">最终得分：0</div>
+    <button class="btn" id="restart-btn">再次逃脱</button>
+  </div>
+</div>
+<script>
+const cv = document.getElementById('game');
+const cx = cv.getContext('2d');
+const W = 400, H = 700;
+let score = 0, oxygen = 100, gameActive = false, frame = 0;
+let player = { x: W/2, y: H - 80, w: 24, h: 32, speed: 5, color: '#3b82f6' };
+let asteroids = [], oxygenBottles = [], stars = [], particles = [];
+let keys = {};
+
+for(let i=0; i<60; i++) {
+  stars.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.5+0.5, alpha: Math.random(), speed: Math.random()*0.5+0.1 });
+}
+
+function spawnAsteroid() {
+  if(frame % 60 === 0) {
+    let size = Math.random()*20+15;
+    asteroids.push({
+      x: Math.random()*(W-size),
+      y: -size,
+      w: size, h: size,
+      speed: Math.random()*2+2,
+      rot: Math.random()*Math.PI*2,
+      rotSpeed: (Math.random()-0.5)*0.1
+    });
+  }
+}
+
+function spawnOxygen() {
+  if(frame % 300 === 0) {
+    oxygenBottles.push({
+      x: Math.random()*(W-20)+10,
+      y: -20,
+      w: 20, h: 20,
+      speed: 2
+    });
+  }
+}
+
+function update() {
+  if(!gameActive) return;
+  frame++;
+  
+  stars.forEach(s => { s.y += s.speed; if(s.y > H) { s.y = -5; s.x = Math.random()*W; } });
+  
+  spawnAsteroid();
+  spawnOxygen();
+  
+  if(keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
+  if(keys['ArrowRight'] || keys['d']) player.x += player.speed;
+  player.x = Math.max(player.w/2, Math.min(W - player.w/2, player.x));
+  
+  for(let i=asteroids.length-1; i>=0; i--) {
+    let a = asteroids[i];
+    a.y += a.speed;
+    a.rot += a.rotSpeed;
+    if(a.y > H) { asteroids.splice(i,1); score += 5; continue; }
+    if(rectCircleCollide(player, a)) { gameOver(); }
+  }
+  
+  for(let i=oxygenBottles.length-1; i>=0; i--) {
+    let o = oxygenBottles[i];
+    o.y += o.speed;
+    if(o.y > H) { oxygenBottles.splice(i,1); continue; }
+    if(rectCircleCollide(player, o)) {
+      oxygenBottles.splice(i,1);
+      oxygen = Math.min(100, oxygen + 25);
+      score += 20;
+      createParticles(o.x, o.y, '#3b82f6', 8);
+    }
+  }
+  
+  oxygen -= 0.15;
+  if(oxygen <= 0) gameOver();
+  
+  for(let i=particles.length-1; i>=0; i--) {
+    let p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.life--; p.alpha -= 0.02;
+    if(p.life <= 0) particles.splice(i,1);
+  }
+  
+  draw();
+  requestAnimationFrame(update);
+}
+
+function rectCircleCollide(rect, circ) {
+  let dx = Math.abs(circ.x + circ.w/2 - rect.x);
+  let dy = Math.abs(circ.y + circ.h/2 - rect.y);
+  if(dx > rect.w/2 + circ.w/2) return false;
+  if(dy > rect.h/2 + circ.h/2) return false;
+  if(dx <= rect.w/2) return true;
+  if(dy <= rect.h/2) return true;
+  let dx2 = dx - rect.w/2, dy2 = dy - rect.h/2;
+  return dx2*dx2 + dy2*dy2 <= (circ.w/2)*(circ.w/2);
+}
+
+function draw() {
+  cx.fillStyle = '#050510';
+  cx.fillRect(0,0,W,H);
+  
+  stars.forEach(s => {
+    cx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+    cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, Math.PI*2); cx.fill();
+  });
+  
+  cx.save();
+  cx.translate(player.x, player.y);
+  cx.fillStyle = player.color;
+  cx.beginPath();
+  cx.moveTo(0, -player.h/2);
+  cx.lineTo(-player.w/2, player.h/2);
+  cx.lineTo(player.w/2, player.h/2);
+  cx.closePath();
+  cx.fill();
+  cx.strokeStyle = '#fff'; cx.lineWidth = 2; cx.stroke();
+  cx.restore();
+  
+  asteroids.forEach(a => {
+    cx.save();
+    cx.translate(a.x + a.w/2, a.y + a.h/2);
+    cx.rotate(a.rot);
+    cx.fillStyle = '#64748b';
+    cx.beginPath();
+    for(let k=0; k<6; k++) {
+      let ang = (k/6)*Math.PI*2;
+      let r = (a.w/2) * (0.7 + 0.3*Math.sin(k));
+      cx.lineTo(Math.cos(ang)*r, Math.sin(ang)*r);
+    }
+    cx.closePath(); cx.fill();
+    cx.restore();
+  });
+  
+  oxygenBottles.forEach(o => {
+    cx.fillStyle = '#22d3ee';
+    cx.beginPath(); cx.arc(o.x, o.y, o.w/2, 0, Math.PI*2); cx.fill();
+    cx.strokeStyle = '#fff'; cx.lineWidth = 2; cx.stroke();
+    cx.fillStyle = '#fff'; cx.font = '12px sans-serif'; cx.textAlign = 'center';
+    cx.fillText('O2', o.x, o.y+4);
+  });
+  
+  particles.forEach(p => {
+    cx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.alpha})`;
+    cx.beginPath(); cx.arc(p.x, p.y, 2, 0, Math.PI*2); cx.fill();
+  });
+}
+
+function createParticles(x,y,color,count) {
+  for(let i=0; i<count; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random()-0.5)*4,
+      vy: (Math.random()-0.5)*4,
+      life: 30,
+      alpha: 1,
+      r: color==='#3b82f6'?59:255, g: color==='#3b82f6'?130:246, b: color==='#3b82f6'?246:100
+    });
+  }
+}
+
+function gameOver() {
+  gameActive = false;
+  document.getElementById('game-over').style.display = 'flex';
+  document.getElementById('final-score').textContent = '最终得分：' + score;
+}
+
+document.getElementById('start-btn').onclick = () => {
+  document.getElementById('overlay').style.display = 'none';
+  startGame();
+};
+document.getElementById('restart-btn').onclick = () => {
+  document.getElementById('game-over').style.display = 'none';
+  startGame();
+};
+
+function startGame() {
+  score = 0; oxygen = 100; gameActive = true;
+  asteroids = []; oxygenBottles = []; particles = [];
+  player.x = W/2; player.y = H - 80;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('oxygen').textContent = '100';
+  frame = 0;
+  update();
+}
+
+document.addEventListener('keydown', e => { keys[e.key] = true; });
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+cv.addEventListener('touchstart', e => {
+  e.preventDefault();
+  let touchX = e.touches[0].clientX - cv.getBoundingClientRect().left;
+  if(touchX < W/2) player.x -= 40; else player.x += 40;
+  player.x = Math.max(player.w/2, Math.min(W - player.w/2, player.x));
+}, {passive:false});
+
+update();
+</script>
+</body>
+</html>
