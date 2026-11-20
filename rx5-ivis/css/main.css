@@ -1,0 +1,46 @@
+:root{--bg:#0b0e14;--bg2:#141926;--card:#1a2030;--card2:#212a3e;--line:#2a3450;--tx:#e8ecf5;--tx2:#8b95b0;--pri:#2f6df6;--pri2:#4d8bff;--acc:#22d3ee;--ok:#2fb47c;--warn:#f2a33c;--bad:#e5484d;--radius:22px}
+[data-theme=light]{--bg:#eef2f8;--bg2:#f7f9fd;--card:#fff;--card2:#f1f4fa;--line:#dde3ee;--tx:#1b2136;--tx2:#67718c;--pri:#2f6df6}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100%;overflow:hidden}
+body{background:radial-gradient(1200px 800px at 70% -10%,rgba(47,109,246,.12),transparent),radial-gradient(900px 700px at -10% 100%,rgba(34,211,238,.08),transparent),var(--bg);color:var(--tx)}
+[v-cloak]{display:none}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+/* statusbar */
+.statusbar{display:flex;align-items:center;gap:12px;padding:10px 22px;font-size:14px;color:var(--tx2);flex:none}
+.statusbar .sb-left,.sb-right{display:flex;gap:14px;align-items:center}
+.sb-mid{flex:1;text-align:center;font-size:22px;font-weight:600;letter-spacing:2px;color:var(--tx)}
+.sb-right .temp{cursor:pointer}
+.themebtn,.wifi.off,.bt.off{opacity:.6}
+/* gear */
+.gearticks{display:flex;align-items:center;gap:10px;padding:2px 22px 8px;flex:none}
+.gearticks span{width:38px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--tx2);background:var(--card);border:1px solid var(--line);cursor:pointer}
+.gearticks span.on{background:linear-gradient(135deg,var(--pri),#7a5cff);color:#fff;box-shadow:0 4px 14px rgba(47,109,246,.45)}
+.gearticks .spd{margin-left:auto;background:none;border:none;box-shadow:none;color:var(--tx);font-size:26px}
+.gearticks .spd small{font-size:12px;color:var(--tx2);margin-left:4px}
+/* stage */
+.stage{flex:1;overflow:hidden;position:relative;margin:0 18px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);min-height:0}
+/* dock */
+.dock{flex:none;display:flex;justify-content:space-around;gap:6px;margin:10px 18px calc(12px + env(safe-area-inset-bottom));background:var(--card);border:1px solid var(--line);border-radius:26px;padding:10px 8px}
+.dock button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--tx2);cursor:pointer;font-size:12px;position:relative;padding:6px 2px;border-radius:16px}
+.dock button i{font-size:22px;font-style:normal;line-height:1}
+.dock button.on{color:#fff;background:linear-gradient(135deg,var(--pri),#7a5cff);box-shadow:0 6px 18px rgba(47,109,246,.4)}
+.dock .dockbadge{position:absolute;top:2px;right:14%;background:var(--acc);color:#063;color:#fff;font-size:10px;border-radius:999px;padding:1px 6px;font-style:normal;font-weight:700}
+/* transitions */
+.page-enter-active,.page-leave-active{transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s}
+.page-enter-from{transform:translateX(28px) scale(.98);opacity:0}
+.page-leave-to{transform:translateX(-28px) scale(.98);opacity:0}
+.pop-enter-active,.pop-leave-active{transition:.25s}
+.pop-enter-from,.pop-leave-to{opacity:0;transform:translate(-50%,-16px)}
+/* toast */
+.toast{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(12,16,26,.86);border:1px solid var(--line);color:var(--tx);font-size:15px;padding:10px 22px;border-radius:999px;z-index:80;backdrop-filter:blur(8px);white-space:nowrap}
+/* voice layer */
+.voice-layer{position:fixed;inset:auto 50% calc(50% + -42vh) auto;transform:translateX(-50%);z-index:120;display:none}
+.voice-layer{display:block;inset:0;background:rgba(8,10,18,.6);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.voice-ball{width:110px;height:110px;border-radius:50%;background:conic-gradient(from 0deg,var(--pri),var(--acc),var(--pri));display:flex;align-items:center;justify-content:center;gap:5px;filter:drop-shadow(0 8px 30px rgba(47,109,246,.5))}
+.voice-ball.listening{animation:spin 3s linear infinite}
+.voice-ball span{width:7px;height:28px;border-radius:4px;background:#fff;animation:eq 1s ease-in-out infinite}
+.voice-ball span:nth-child(2){animation-delay:.15s}.voice-ball span:nth-child(3){animation-delay:.3s}.voice-ball span:nth-child(4){animation-delay:.45s}
+@keyframes eq{0%,100%{height:16px}50%{height:34px}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.voice-text{font-size:24px;font-weight:600;max-width:70%;text-align:center;line-height:1.5}
+.voice-tip{color:var(--tx2);font-size:14px}
