@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简易计算器 · test-v3</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  .calc {
+    width: 340px; background: #111827; border-radius: 20px;
+    padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,.55);
+  }
+  .screen {
+    background: #0b1220; border-radius: 12px; padding: 16px;
+    text-align: right; margin-bottom: 16px; min-height: 96px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    overflow: hidden;
+  }
+  .expr { color: #64748b; font-size: 15px; min-height: 20px; word-break: break-all; }
+  .val  { color: #f8fafc; font-size: 38px; font-weight: 600; word-break: break-all; }
+  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  button {
+    border: 0; border-radius: 12px; padding: 18px 0;
+    font-size: 19px; font-weight: 600; cursor: pointer;
+    background: #1f2937; color: #e2e8f0; transition: .15s;
+  }
+  button:hover { filter: brightness(1.25); }
+  button:active { transform: scale(.96); }
+  .fn { background: #334155; }
+  .op { background: #2563eb; color: #fff; }
+  .eq { background: #16a34a; color: #fff; grid-column: span 2; }
+</style>
+</head>
+<body>
+<div class="calc">
+  <div class="screen">
+    <div class="expr" id="expr"></div>
+    <div class="val" id="val">0</div>
+  </div>
+  <div class="keys">
+    <button class="fn" data-k="C">C</button>
+    <button class="fn" data-k="DEL">⌫</button>
+    <button class="fn" data-k="%">%</button>
+    <button class="op" data-k="/">÷</button>
+
+    <button data-k="7">7</button>
+    <button data-k="8">8</button>
+    <button data-k="9">9</button>
+    <button class="op" data-k="*">×</button>
+
+    <button data-k="4">4</button>
+    <button data-k="5">5</button>
+    <button data-k="6">6</button>
+    <button class="op" data-k="-">−</button>
+
+    <button data-k="1">1</button>
+    <button data-k="2">2</button>
+    <button data-k="3">3</button>
+    <button class="op" data-k="+">+</button>
+
+    <button data-k="0">0</button>
+    <button data-k=".">.</button>
+    <button class="eq" data-k="=">=</button>
+  </div>
+</div>
+<script>
+  const exprEl = document.getElementById('expr');
+  const valEl = document.getElementById('val');
+  let expr = '';
+
+  function render() {
+    exprEl.textContent = expr || '';
+    try {
+      if (!expr) { valEl.textContent = '0'; return; }
+      const safe = expr.replace(/[^0-9+\-*/.%()]/g, '');
+      const r = Function('"use strict";return (' + safe + ')')();
+      valEl.textContent = (r === undefined || Number.isNaN(r)) ? '…' : String(r);
+    } catch (e) { valEl.textContent = '…'; }
+  }
+
+  function apply(k) {
+    if (k === 'C') expr = '';
+    else if (k === 'DEL') expr = expr.slice(0, -1);
+    else if (k === '=') {
+      try {
+        const safe = expr.replace(/[^0-9+\-*/.%()]/g, '');
+        const r = Function('"use strict";return (' + safe + ')')();
+        expr = (r === undefined || Number.isNaN(r)) ? '' : String(r);
+      } catch (e) { expr = ''; }
+    } else expr += k;
+    render();
+  }
+
+  document.querySelectorAll('button[data-k]').forEach(b => {
+    b.addEventListener('click', () => apply(b.dataset.k));
+  });
+
+  document.addEventListener('keydown', e => {
+    const m = { '/': '/', '*': '*', '-': '-', '+': '+', '.': '.', '%': '%', 'Enter': '=', '=': '=', 'Backspace': 'DEL', 'Escape': 'C' };
+    if (/^[0-9]$/.test(e.key)) { apply(e.key); e.preventDefault(); }
+    else if (m[e.key]) { apply(m[e.key]); e.preventDefault(); }
+  });
+
+  render();
+</script>
+</body>
+</html>
