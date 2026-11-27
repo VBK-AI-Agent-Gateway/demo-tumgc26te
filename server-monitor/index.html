@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>服务器监控 · Server Monitor</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:#0e1116; --panel:#161b23; --panel2:#1c222c; --line:#262d38;
+    --txt:#e6eaf0; --mut:#8b95a6; --ok:#3fb950; --warn:#d29922; --crit:#f85149; --blue:#2e75b6;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }
+  header { display:flex; align-items:center; justify-content:space-between;
+           padding:16px 28px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:17px; margin:0; font-weight:600; letter-spacing:.3px; }
+  .dot { width:9px; height:9px; border-radius:50%; background:var(--ok); display:inline-block;
+         margin-right:8px; animation:pulse 1.6s infinite; }
+  @keyframes pulse { 50% { opacity:.35; } }
+  .clock { font-variant-numeric:tabular-nums; color:var(--mut); font-size:13px; }
+  main { padding:24px 28px; display:grid; gap:20px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .card .lbl { color:var(--mut); font-size:12.5px; margin-bottom:10px; }
+  .card .val { font-size:30px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .card .sub { color:var(--mut); font-size:12px; margin-top:6px; }
+  .bar { height:6px; border-radius:4px; background:var(--panel2); margin-top:12px; overflow:hidden; }
+  .bar > i { display:block; height:100%; border-radius:4px; background:var(--blue); transition:width .4s; }
+  .bar.warn > i { background:var(--warn); } .bar.crit > i { background:var(--crit); }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  section > h2 { font-size:14px; margin:0; padding:14px 20px; border-bottom:1px solid var(--line);
+                 color:var(--mut); font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th,td { text-align:left; padding:11px 20px; border-bottom:1px solid var(--line); }
+  th { background:#1F4E79; color:#fff; font-weight:600; font-size:12.5px; letter-spacing:.3px; }
+  tr:last-child td { border-bottom:none; }
+  .tag { padding:2px 9px; border-radius:999px; font-size:12px; font-weight:600; }
+  .t-ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .t-warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .t-crit { background:rgba(248,81,73,.15); color:var(--crit); }
+  .num { font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="dot"></span>服务器监控 · Server Monitor</h1>
+  <div class="clock" id="clock">--:--:--</div>
+</header>
+<main>
+  <div class="cards" id="cards"></div>
+
+  <section>
+    <h2>节点状态 / Nodes</h2>
+    <table>
+      <thead><tr><th>主机</th><th>区域</th><th>CPU</th><th>内存</th><th>磁盘</th><th>负载(1m)</th><th>状态</th></tr></thead>
+      <tbody id="nodes"></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>最近事件 / Recent Events</h2>
+    <table>
+      <thead><tr><th>时间</th><th>主机</th><th>级别</th><th>事件</th></tr></thead>
+      <tbody id="events"></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
+const hosts=[
+  ["web-01","华东","10.0.1.11"],["web-02","华东","10.0.1.12"],
+  ["api-01","华北","10.0.2.21"],["api-02","华北","10.0.2.22"],
+  ["db-master","华东","10.0.3.31"],["db-replica","华南","10.0.3.32"],
+  ["cache-01","华南","10.0.4.41"],["worker-01","华东","10.0.5.51"]
+];
+function level(v){ return v>=90?"crit":v>=75?"warn":"ok"; }
+function tag(l){ const m={ok:["t-ok","正常"],warn:["t-warn","偏高"],crit:["t-crit","告警"]}; 
+  return `<span class="tag ${m[l][0]}">${m[l][1]}</span>`; }
+
+function snapshot(){
+  return hosts.map(([h,region,ip])=>{
+    const cpu=rnd(8,97), mem=rnd(20,95), disk=rnd(15,92), load=(Math.random()*4+0.4).toFixed(2);
+    const worst=Math.max(cpu,mem,disk), lv=level(worst);
+    return {h,region,ip,cpu,mem,disk,load,lv};
+  });
+}
+function renderCards(s){
+  const avgCpu=Math.round(s.reduce((a,x)=>a+x.cpu,0)/s.length);
+  const avgMem=Math.round(s.reduce((a,x)=>a+x.mem,0)/s.length);
+  const alerts=s.filter(x=>x.lv!=="ok").length;
+  const up=s.filter(x=>x.cpu<99).length;
+  const data=[
+    ["在线节点",up+" / "+s.length,"",Math.round(up/s.length*100)],
+    ["平均 CPU",avgCpu+"%","",avgCpu,level(avgCpu)],
+    ["平均内存",avgMem+"%","",avgMem,level(avgMem)],
+    ["告警节点",alerts,"",Math.min(100,alerts/s.length*100),alerts?"warn":"ok"]
+  ];
+  document.getElementById("cards").innerHTML=data.map(([lbl,val,sub,pct,lv])=>{
+    const cls=(lv==="crit"||lv==="warn")?lv:"";
+    return `<div class="card"><div class="lbl">${lbl}</div>
+      <div class="val">${val}</div>${sub?`<div class="sub">${sub}</div>`:""}
+      <div class="bar ${cls}"><i style="width:${Math.min(100,Math.max(4,pct||0))}%"></i></div></div>`;
+  }).join("");
+}
+function renderNodes(s){
+  document.getElementById("nodes").innerHTML=s.map(x=>`<tr>
+    <td><b>${x.h}</b><div style="color:var(--mut);font-size:11.5px">${x.ip}</div></td>
+    <td>${x.region}</td>
+    <td class="num">${x.cpu}%</td><td class="num">${x.mem}%</td>
+    <td class="num">${x.disk}%</td><td class="num">${x.load}</td>
+    <td>${tag(x.lv)}</td></tr>`).join("");
+}
+const evtPool=[["CPU 使用率超过 90%","warn"],["磁盘空间低于 10%","crit"],
+  ["节点健康检查通过","ok"],["内存使用率回升至正常","ok"],
+  ["数据库连接池接近上限","warn"],["服务自动扩容完成","ok"],
+  ["网络延迟短暂抖动","warn"],["备份任务完成","ok"]];
+function renderEvents(){
+  const rows=[];
+  for(let i=0;i<7;i++){
+    const [txt,lv]=evtPool[rnd(0,evtPool.length-1)];
+    const h=hosts[rnd(0,hosts.length-1)][0];
+    const t=new Date(Date.now()-i*rnd(60,900)*1000);
+    rows.push(`<tr><td class="num">${t.toLocaleTimeString("zh-CN",{hour12:false})}</td>
+      <td>${h}</td><td>${tag(lv)}</td><td>${txt}</td></tr>`);
+  }
+  document.getElementById("events").innerHTML=rows.join("");
+}
+function tick(){
+  const s=snapshot();
+  renderCards(s); renderNodes(s);
+  document.getElementById("clock").textContent=new Date().toLocaleString("zh-CN",{hour12:false});
+}
+tick(); renderEvents();
+setInterval(tick,3000);
+setInterval(renderEvents,15000);
+</script>
+</body>
+</html>
