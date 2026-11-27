@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>stats.py · 文本词频统计小工具</title>
+<title>stats.py · 词频 + 按行数统计</title>
 <style>
   body{font-family:-apple-system,"Microsoft YaHei",sans-serif;max-width:820px;margin:48px auto;padding:0 20px;color:#222;line-height:1.75}
   h1{color:#1F4E79;border-bottom:3px solid #2E75B6;padding-bottom:8px}
@@ -12,22 +12,51 @@
   code{background:#f4f6f8;padding:1px 5px;border-radius:4px}
   li{margin:6px 0}
   a{color:#C00000}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0}
+  th{background:#1F4E79;color:#fff;text-align:left;padding:9px 12px}
+  td{padding:8px 12px;border-bottom:1px solid #eceef1}
+  .new{display:inline-block;background:#fdecec;color:#C00000;font-size:11px;border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:700}
 </style>
 </head>
 <body>
-<h1>stats.py · 文本词频统计小工具</h1>
-<p>单文件 Python 脚本，统计一段文本里每个词出现的次数。无第三方依赖，Python 3.6+ 直接运行。</p>
+<h1>stats.py · 词频 + 按行数统计</h1>
+<p>单文件 Python 脚本。原有能力：统计一段文本里每个词出现的次数；<b>本次新增：按行数统计</b>。无第三方依赖，Python 3.6+ 直接运行。</p>
+
+<h2>本次新增 · 按行数统计</h2>
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>total_lines</td><td>总行数（含空行）<span class="new">新增</span></td></tr>
+  <tr><td>non_empty_lines</td><td>非空行数<span class="new">新增</span></td></tr>
+  <tr><td>blank_lines</td><td>空行数（仅空白字符）<span class="new">新增</span></td></tr>
+  <tr><td>code_lines</td><td>有效代码行（非空且非注释）<span class="new">新增</span></td></tr>
+  <tr><td>comment_lines</td><td>注释行（以 # 开头）<span class="new">新增</span></td></tr>
+  <tr><td>max_line_len</td><td>最长行字符数<span class="new">新增</span></td></tr>
+  <tr><td>avg_line_len</td><td>平均行长（按总行数）<span class="new">新增</span></td></tr>
+</table>
+
 <h2>用法</h2>
-<pre>python3 stats.py "the quick brown fox jumps over the lazy dog the fox"
+<pre># 词频（原有）
+python3 stats.py "the quick brown fox jumps over the lazy dog the fox"
 python3 stats.py -f 文章.txt
-cat 文章.txt | python3 stats.py</pre>
-<h2>输出示例</h2>
-<pre>the    3  ##############################
-fox    2  ####################
-quick  1  ##########
-...
-----
-共 8 个不同词，累计 11 个词次</pre>
+cat 文章.txt | python3 stats.py
+
+# 按行数统计（新增）
+python3 stats.py -l -f 文章.txt        # 词频 + 行数统计
+python3 stats.py --lines-only -f stats.py   # 只输出行数统计
+
+# JSON（含 line_stats）
+python3 stats.py -j -l -f 文章.txt</pre>
+
+<h2>输出示例（--lines-only）</h2>
+<pre>—— 按行数统计 ——
+总行数        : 11
+非空行数      : 7
+空行数        : 4
+有效代码行    : 4
+注释行        : 3
+最长行字符数  : 27
+平均行长      : 6.9</pre>
+
 <h2>参数</h2>
 <ul>
   <li><code>-f 文件</code> 从文件读取文本</li>
@@ -35,8 +64,11 @@ quick  1  ##########
   <li><code>-c</code> 区分大小写（默认不区分）</li>
   <li><code>-j</code> 输出 JSON，便于程序调用</li>
   <li><code>--no-bar</code> 不显示条形图</li>
+  <li><code>-l / --lines</code> 同时输出按行数统计 <b>（新增）</b></li>
+  <li><code>--lines-only</code> 只输出按行数统计 <b>（新增）</b></li>
 </ul>
+
 <h2>下载脚本</h2>
-<p><a href="./stats.py">stats.py</a></p>
+<p><a href="./stats.py">stats.py</a> · 示例文本 <a href="./stats-demo.txt">stats-demo.txt</a></p>
 </body>
 </html>
